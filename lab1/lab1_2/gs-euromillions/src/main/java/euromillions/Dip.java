@@ -27,12 +27,27 @@ public class Dip {
     public Dip(int[] arrayOfNumbers, int[] arrayOfStarts) {
         this();
 
-        if (REQUIRED_NUMBERS_COUNT_FOR_BET == arrayOfNumbers.length && REQUIRED_STARS_COUNT_FOR_BET == arrayOfStarts.length) {
-            numbers.add(arrayOfNumbers);
-            starts.add(arrayOfStarts);
-        } else {
+        if (REQUIRED_NUMBERS_COUNT_FOR_BET != arrayOfNumbers.length) {
             throw new IllegalArgumentException("wrong number of elements in numbers/stars");
         }
+
+        if (REQUIRED_STARS_COUNT_FOR_BET != arrayOfStarts.length) {
+            throw new IllegalArgumentException("wrong number of elements in numbers/stars");
+        }
+
+        for (int number : arrayOfNumbers) {
+            if (50 < number) {
+                throw new IllegalArgumentException("Invalid number chosen: " + number);
+            }
+        }
+        for (int star : arrayOfStarts) {
+            if (12 < star) {
+                throw new IllegalArgumentException("Invalid star chosen: " + star);
+            }
+        }
+
+        numbers.add(arrayOfNumbers);
+        starts.add(arrayOfStarts);
 
     }
 
@@ -105,8 +120,9 @@ public class Dip {
         }
         sb.append("] S[");
         for (int star : getStarsColl()) {
-            sb.append(String.format("%d", star));
+            sb.append(String.format("%3d", star));
         }
+        sb.append("]");
         return sb.toString();
     }
 }

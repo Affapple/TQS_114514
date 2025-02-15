@@ -30,7 +30,36 @@ public class DipTest {
     @Test
     public void testConstructorFromBadArrays() {
     	// todo: instantiating a dip passing invalid arrays should raise an exception
-    	fail("constructor from bad arrays: test not implemented yet");
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+    	    () -> new Dip( new int[] {0,20,30,40,50}, new int[] {1,2}),
+            "Constructor with bad arrays (Illegal number chosen) not returning IllegalArgumentException"
+        );
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+    	    () -> new Dip( new int[] {10,20,30,40,51}, new int[] {1,2}),
+            "Constructor with bad arrays (Illegal number chosen) not returning IllegalArgumentException"
+        );
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+    	    () -> new Dip( new int[] {10,20,30,40,50}, new int[] {13,2}),
+            "Constructor with bad arrays (Illegal Star chosen) not returning IllegalArgumentException"
+        );
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+    	    () -> new Dip( new int[] {10,20,30,40,50}, new int[] {11,0}),
+            "Constructor with bad arrays (Illegal Star chosen) not returning IllegalArgumentException"
+        );
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+    	    () -> new Dip( new int[] {10,30,40,50}, new int[] {11,1}),
+            "Constructor with bad arrays (Not respecting number of numbers) not returning IllegalArgumentException"
+        );
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+    	    () -> new Dip( new int[] {10,20, 30,40,50}, new int[] {11}),
+            "Constructor with bad array (Not respecting number of stars) not returning IllegalArgumentException"
+        );
     }
      
     @Test

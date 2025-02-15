@@ -7,7 +7,7 @@ public class SetOfNumbersTest {
 	private SetOfNumbers setA;
 	private SetOfNumbers setB;
 	private SetOfNumbers setC;
-        private SetOfNumbers setD;
+    private SetOfNumbers setD;
 	
 	/**
 	 * create some sets for testing
@@ -16,13 +16,13 @@ public class SetOfNumbersTest {
 	@BeforeEach
 	public void setUp() throws Exception {
 		setA = new SetOfNumbers();		
-		setB = SetOfNumbers.fromArray( new int[]{ 10, 20, 30, 40, 50, 60});
+		setB = SetOfNumbers.fromArray( new int[]{ 10, 20, 30, 40, 50, 60} );
 	
 		setC = new SetOfNumbers();
 		for (int i = 5; i < 50; i++) {
 			setC.add(i * 10);
 		}				
-                setD = SetOfNumbers.fromArray( new int[]{ 30, 40, 50, 60, 10, 20});
+        setD = SetOfNumbers.fromArray( new int[]{ 30, 40, 50, 60, 10, 20});
 	}
 
 	@AfterEach
@@ -41,6 +41,11 @@ public class SetOfNumbersTest {
 		assertTrue(  setA.contains(11), "add: added element not found in set." );
 		assertEquals( 2, setA.size(),  "add: elements count not as expected." );
 	}
+    @Test
+    @DisplayName("Test Intersection")
+    public void testSubtraction() {
+        // TODO
+    } 
 
 	@Test
 	@DisplayName("two non overlaping sets report no intersection")
@@ -68,6 +73,4 @@ public class SetOfNumbersTest {
 	public void testNoDuplicates() {    
 	    assertThrows( IllegalArgumentException.class,  ()->setB.add( 20 ));	// duplicate, must fail with an exception	    
 	}
-
-      
 }
