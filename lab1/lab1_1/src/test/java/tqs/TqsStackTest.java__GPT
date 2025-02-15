@@ -1,0 +1,72 @@
+package tqs;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.NoSuchElementException;
+
+
+public class TqsStackTest {
+    
+    @Test
+    void testStackIsEmptyOnConstruction() {
+        TqsStack<Integer> stack = new TqsStack<>();
+        assertTrue(stack.isEmpty());
+    }
+
+    @Test
+    void testStackHasSizeZeroOnConstruction() {
+        TqsStack<Integer> stack = new TqsStack<>();
+        assertEquals(0, stack.size());
+    }
+
+    @Test
+    void testPushesMakeStackNonEmptyAndSizeN() {
+        TqsStack<Integer> stack = new TqsStack<>();
+        stack.push(1);
+        stack.push(2);
+        stack.push(3);
+        assertFalse(stack.isEmpty());
+        assertEquals(3, stack.size());
+    }
+
+    @Test
+    void testPushThenPopReturnsSameValue() {
+        TqsStack<Integer> stack = new TqsStack<>();
+        stack.push(42);
+        assertEquals(42, stack.pop());
+    }
+
+    @Test
+    void testPushThenPeekReturnsSameValueWithoutChangingSize() {
+        TqsStack<Integer> stack = new TqsStack<>();
+        stack.push(99);
+        assertEquals(99, stack.peek());
+        assertEquals(1, stack.size());
+    }
+
+    @Test
+    void testPoppingUntilEmptyResultsInSizeZero() {
+        TqsStack<Integer> stack = new TqsStack<>();
+        stack.push(1);
+        stack.push(2);
+        stack.push(3);
+        stack.pop();
+        stack.pop();
+        stack.pop();
+        assertTrue(stack.isEmpty());
+        assertEquals(0, stack.size());
+    }
+
+    @Test
+    void testPopOnEmptyStackThrowsException() {
+        TqsStack<Integer> stack = new TqsStack<>();
+        assertThrows(NoSuchElementException.class, stack::pop);
+    }
+
+    @Test
+    void testPeekOnEmptyStackThrowsException() {
+        TqsStack<Integer> stack = new TqsStack<>();
+        assertThrows(NoSuchElementException.class, stack::peek);
+    }
+}
