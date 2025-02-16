@@ -6,70 +6,70 @@ import java.util.Objects;
 
 /**
  * a simple set of numbers with helper set operators
+ * 
  * @author ico0
  */
-public class SetOfNumbers  implements Iterable<Integer> {
-	
-	private ArrayList<Integer> collection = null;
-	
+public class SetOfNumbers implements Iterable<Integer> {
 
-	public static SetOfNumbers fromArray( int[] values) {
-		SetOfNumbers newSet = new SetOfNumbers();
-		for( int n : values) {
-			newSet.add( n);
-		}
-		return newSet;
-	}
-	
-	public SetOfNumbers() {
-		super();
-		collection = new ArrayList<Integer>();
-	}
-        
-        public int size() {
-            return this.collection.size();
+    private ArrayList<Integer> collection = null;
+
+    public static SetOfNumbers fromArray(int[] values) {
+        SetOfNumbers newSet = new SetOfNumbers();
+        for (int n : values) {
+            newSet.add(n);
+        }
+        return newSet;
+    }
+
+    public SetOfNumbers() {
+        super();
+        collection = new ArrayList<Integer>();
+    }
+
+    public int size() {
+        return this.collection.size();
+    }
+
+    /**
+     * put a new member in the set; duplicates not allowed
+     * 
+     * @param element
+     */
+    public void add(int element) {
+        if (this.collection.contains(element)) {
+            throw new IllegalArgumentException("duplicate value: " + element);
         }
 
-        /**
-         * put a new member in the set; duplicates not allowed
-         * @param element 
-         */
-	public void add(int element) {
-		if( this.collection.contains(element )) {
-			throw new IllegalArgumentException("duplicate value: " + element);
-		}
-		
-		collection.add( element);		
-	}
+        collection.add(element);
+    }
 
-	public boolean intersects(SetOfNumbers subset) {
+    public boolean intersects(SetOfNumbers subset) {
         for (int number : subset) {
             if (this.contains(number))
                 return true;
         }
         return false;
-	}
+    }
 
-	/**
-	 * subtract (exclude) the elements in the passed subset from the current set
-	 * @return
-	 */
-	public void subtract (SetOfNumbers subset) {
+    /**
+     * subtract (exclude) the elements in the passed subset from the current set
+     * 
+     * @return
+     */
+    public void subtract(SetOfNumbers subset) {
         for (Integer number : subset) {
             collection.remove(number);
         }
-	}
+    }
 
+    public boolean contains(Integer element) {
+        return collection.contains(element);
+    }
 
-	public  boolean contains(Integer element) {
-		return collection.contains( element);
-	}
-
-	@Override
-	public Iterator<Integer> iterator() {		
-		return collection.iterator();
-	}
-
+    @Override
+    public Iterator<Integer> iterator() {
+        return collection.iterator();
+    }
 
     @Override
     public int hashCode() {
@@ -95,6 +95,5 @@ public class SetOfNumbers  implements Iterable<Integer> {
         }
         return true;
     }
-              
-	
+
 }

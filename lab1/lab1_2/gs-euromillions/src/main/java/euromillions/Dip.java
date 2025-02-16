@@ -52,16 +52,15 @@ public class Dip {
     }
 
     public static Dip generateRandomDip() {
-
         Dip randomDip = new Dip();
-        for (int i = 0; i < REQUIRED_NUMBERS_COUNT_FOR_BET; ) {
+        for (int i = 0; i < REQUIRED_NUMBERS_COUNT_FOR_BET;) {
             int candidate = generator.nextInt(49) + 1;
             if (!randomDip.getNumbersColl().contains(candidate)) {
                 randomDip.getNumbersColl().add(candidate);
                 i++;
             }
         }
-        for (int i = 0; i < REQUIRED_STARS_COUNT_FOR_BET; ) {
+        for (int i = 0; i < REQUIRED_STARS_COUNT_FOR_BET;) {
             int candidate = generator.nextInt(11) + 1;
             if (!randomDip.getStarsColl().contains(candidate)) {
                 randomDip.getStarsColl().add(candidate);
@@ -104,7 +103,6 @@ public class Dip {
         }
         return Objects.equals(this.starts, other.starts);
     }
-
 
     /**
      * prepares a string representation of the data structure, formated for
