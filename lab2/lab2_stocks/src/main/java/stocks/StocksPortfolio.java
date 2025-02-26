@@ -37,9 +37,18 @@ public class StocksPortfolio {
         topN = Math.min(stocks.size(), topN);
 
         ArrayList<Stock> topNStocks = new ArrayList<>(topN);
-        var x = stocks.stream().sorted().iterator();
+        var x = stocks.stream().sorted(
+            (s1, s2) ->
+                Double.compare(
+                    s2.quantity * stockmarket.lookUpPrice(s2.label),
+                    s1.quantity * stockmarket.lookUpPrice(s1.label)
+                )
+        ).iterator();
 
         for (int i = 0; i < topN; i++) {
+            if (!x.hasNext()) {
+                break;
+            }
             topNStocks.add(x.next());
         }
 

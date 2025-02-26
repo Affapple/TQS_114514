@@ -3,11 +3,12 @@ package stocks;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,5 +71,50 @@ public class StocksPortfolioTest {
                 equalTo((1 * EBAY) + (3 * TSLA) + (5 * TSLA)));
 
         Mockito.verify(market, Mockito.times(5)).lookUpPrice(Mockito.anyString());
+    }
+
+    @Test
+    public void whenGettingZeroMostValuableStock_thenEmptyList() {
+        portfolio.addStock(new Stock("EBAY", 1));
+        portfolio.addStock(new Stock("TSLA", 3));
+        assertThat(
+            portfolio.mostValuableStocks(0),
+            hasSize(0)
+        );
+    }
+    @Test
+    public void whenGettingKMostValuableStock_thenListHasKValues() {
+        double TSLA = 100d, EBAY = 50d, MSFT = 125d;
+
+        Mockito.when(market.lookUpPrice("EBAY")).thenReturn(EBAY);
+        Mockito.when(market.lookUpPrice("TSLA")).thenReturn(TSLA);
+        Mockito.when(market.lookUpPrice("MSFT")).thenReturn(MSFT);
+
+        portfolio.addStock(new Stock("EBAY", 1));
+        portfolio.addStock(new Stock("TSLA", 3));
+        portfolio.addStock(new Stock("MSFT", 3));
+
+        int K = 2;
+        assertThat(
+            portfolio.mostValuableStocks(K),
+            hasSize(K)
+        );
+    }
+    @Test
+    public void whenGettingMoreThanSizeMostValuableStock_thenListHasSizeValues() {
+        double TSLA = 100d, EBAY = 50d, MSFT = 125d;
+
+        Mockito.when(market.lookUpPrice("EBAY")).thenReturn(EBAY);
+        Mockito.when(market.lookUpPrice("TSLA")).thenReturn(TSLA);
+        Mockito.when(market.lookUpPrice("MSFT")).thenReturn(MSFT);
+
+        portfolio.addStock(new Stock("EBAY", 1));
+        portfolio.addStock(new Stock("TSLA", 3));
+        portfolio.addStock(new Stock("MSFT", 3));
+
+        assertThat(
+            portfolio.mostValuableStocks(10),
+            hasSize(3)
+        );
     }
 }
