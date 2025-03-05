@@ -7,7 +7,8 @@ import tqs.cars.entity.Car;
 
 public interface CarManagerService {
 
-    public void save(Car car);
+    public Car save(Car car);
     public List<Car> getAllCars();
     public Optional<Car> getCarDetails(Long carId);
+    public Optional<Car> findReplacement(Car car);
 }

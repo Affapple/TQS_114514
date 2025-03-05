@@ -26,4 +26,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
      */
     @Query("SELECT e FROM Employee e WHERE e.email LIKE concat('%', :domain)")
     List<Employee> findEmplyeedByOrganizationDomain(@Param("domain") String domain);
+
+
 }

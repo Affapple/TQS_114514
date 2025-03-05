@@ -4,6 +4,7 @@ package tqs.cars.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.*;
 
 @Entity
@@ -12,7 +13,8 @@ import lombok.*;
 @Setter
 @ToString(of = {"carId", "maker", "model"})
 public class Car {
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long carId;
 
     String maker;
