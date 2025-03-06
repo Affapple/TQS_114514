@@ -1,0 +1,23 @@
+{
+   "browsers": [
+      [
+         {
+            "type": "chrome"
+         }
+      ],
+      [
+         {
+            "type": "edge",
+             "arguments" : [
+                "--headless"
+             ]
+         }
+      ],
+      [
+         {
+            "type": "firefox-in-docker",
+            "version": "93"
+         }
+      ]
+   ]
+}
