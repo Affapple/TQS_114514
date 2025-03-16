@@ -3,9 +3,10 @@ package io.github.bonigarcia;
 import java.time.LocalDateTime;
 
 public class Book {
-    LocalDateTime published;
-    String author;
-    String title;
+    private LocalDateTime published;
+    private String author;
+    private String title;
+
     public Book(String author, String title, LocalDateTime published) {
         this.author = author;
         this.title = title;
