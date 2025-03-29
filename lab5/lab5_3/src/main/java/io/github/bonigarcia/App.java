@@ -1,4 +1,4 @@
-package tqs.tests;
+package io.github.bonigarcia;
 
 public class App {
     

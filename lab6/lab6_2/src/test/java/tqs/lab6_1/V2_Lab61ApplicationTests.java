@@ -7,53 +7,26 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-
 
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class Lab61ApplicationTests {
+class V2_Lab61ApplicationTests {
     @Autowired
     private BookRepository repo;
-
-    @DynamicPropertySource
-    static void properties(DynamicPropertyRegistry registry) {
-        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
-    }
-
-    @BeforeEach
-    public void populateDB() {
-        String title = "Harry Potter e a pedra filosofal";
-        Book harryPotterBook = new Book(title, "TheySeeMe Rowling", LocalDate.of(2002, 12, 10));
-        repo.save(harryPotterBook);
-
-        title = "Harry Potter e os talismas da morte part 1";
-        Book harryPotterBook2 = new Book(title, "TheySeeMe Rowling", LocalDate.of(2006, 12, 10));
-        repo.save(harryPotterBook2);
-
-        title = "Book 2";
-        Book book2 = new Book(title, "book2 author", LocalDate.of(2003, 12, 10));
-
-        title = "Book 3";
-        Book book3 = new Book(title, "book3 author", LocalDate.of(2003, 6, 21));
-
-        repo.saveAll(List.of(book2, book3));
-    }
 
     @Test
     void whenAddBook_thenBookIsAdded() {
         String title = "Harry potter e os talismas da morte parte 2";
-        Book harryPotterBook = new Book(title, "TheySeeMe Rowling", LocalDate.of(2007, 12, 10));
+        Book harryPotterBook = new Book(title, "JK. Rowling", LocalDate.of(2007, 12, 10));
         repo.save(harryPotterBook);
+
         assertEquals(repo.findByTitle(title).size(), 1);
         assertTrue(
             repo.findByTitle(title)
@@ -65,6 +38,7 @@ class Lab61ApplicationTests {
     @Test
     void whenRetrieveBookById_thenCorrectBookIsReturned() {
         List<Book> books = repo.findAll();
+        System.out.println("\n\n" + books.size());
         Book lastBook = books.getLast();
         Optional<Book> retrievedBook = repo.findById(lastBook.getId());
 
@@ -86,7 +60,7 @@ class Lab61ApplicationTests {
 
     @Test
     void whenDeleteBook_thenBookIsRemoved() {
-        List<Book> searchResult = repo.findByTitle("Book 3");
+        List<Book> searchResult = repo.findByTitle("Book 2");
         Book book3 = searchResult.getFirst();
 
         repo.deleteById(book3.getId());
