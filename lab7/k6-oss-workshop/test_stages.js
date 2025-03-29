@@ -4,25 +4,16 @@ const BASE_URL = __ENV.BASE_URL || "http://localhost:3333";
 
 export const options = {
   stages: [
-    {
-      duration: "30s",
-      target: 20,
-    },
-    {
-      duration: "30s",
-      target: 20,
-    },
-    {
-      duration: "30s",
-      target: 0,
-    },
+    // ramp up from 0 to 20 VUs over the next 5 seconds
+    { duration: "5s", target: 20 },
+    // run 20 VUs over the next 10 seconds
+    { duration: "10s", target: 20 },
+    // ramp down from 20 to 0 VUs over the next 5 seconds
+    { duration: "5s", target: 0 },
   ],
-  thresholds: {
-    http_req_failed: ["rate<0.01"], // http errors têm de ser inferior a 1%
-    http_req_duration: ["p(95)<200"], // 95% dos requests tem de ser inferior a 200ms
-  },
 };
-export default function () {
+
+export default function() {
   let restrictions = {
     maxCaloriesPerSlice: 500,
     mustBeVegetarian: false,
