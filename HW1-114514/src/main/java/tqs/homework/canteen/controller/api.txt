@@ -1,0 +1,17 @@
+/restaurant
+    GET -> return all restaurants
+    /{restaurant_id}
+        GET -> get restaurant info
+        /menus
+            GET -> get menus 
+                if (Param day)
+                    for the following <days> days (if Param days)
+                else
+                    all menus 
+/menu
+    POST -> Create new Menu (Body MenuRequestDTO)
+    /{menu_id}
+        PUT -> Add meal to existing menu Body(MealDTO)
+        DELETE -> Delete Menu
+        /{meal_id}
+            DELETE -> Remove meal from menu
