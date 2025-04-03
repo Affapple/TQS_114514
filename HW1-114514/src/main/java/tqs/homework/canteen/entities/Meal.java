@@ -4,7 +4,6 @@ import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.*;
-import tqs.homework.canteen.EnumTypes.MealTime;
 import tqs.homework.canteen.EnumTypes.MealType;
 
 @Entity
@@ -17,13 +16,13 @@ public class Meal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String description;
+
+    @Column(name="meal_type")
+    private MealType type;
 
     @ManyToOne
     private Menu menu;
-
-    private String description;
-    private MealType mealType;
-    private MealTime mealTime;
     
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL)
     private List<Reservation> reservations;

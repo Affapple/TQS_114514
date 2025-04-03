@@ -27,6 +27,7 @@ public class Reservation {
     @ManyToOne
     private Meal meal;
 
+
     public String generateCode() {
         code = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         return code;

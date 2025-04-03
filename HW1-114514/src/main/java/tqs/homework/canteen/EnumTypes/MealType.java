@@ -5,9 +5,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum MealType {
     SOUP("soup"),
-    PLATE("plate"),
-    PLATE_OPT("plate_opt"),
-    PLATE_VEG("plate_veg");
+    MEAT("meat"),
+    FISH("FISH");
 
     private String name;
     MealType(String name) {
@@ -24,12 +23,10 @@ public enum MealType {
         switch (name) {
             case "soup":
                 return MealType.SOUP;
-            case "plate":
-                return MealType.PLATE;
-            case "plate_opt":
-                return MealType.PLATE_OPT;
-            case "plate_veg":
-                return MealType.PLATE_VEG;
+            case "meat":
+                return MealType.MEAT;
+            case "fish":
+                return MealType.FISH;
         }
         throw new IllegalArgumentException("\"" + name +"\" is not a valid meal type");
     }

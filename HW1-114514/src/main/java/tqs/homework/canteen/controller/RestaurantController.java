@@ -1,13 +1,14 @@
 package tqs.homework.canteen.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import tqs.homework.canteen.DTOs.MenuDTO;
@@ -22,12 +23,18 @@ public class RestaurantController {
     }
 
     @GetMapping("/{restaurant_id}")
-    public ResponseEntity<Restaurant> getRestaurant(@PathVariable Long restaurantId) {
+    public ResponseEntity<Restaurant> getRestaurant(
+        @PathVariable Long restaurantId
+    ) {
         return new ResponseEntity<>(null, HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @GetMapping("/menus")
-    public ResponseEntity<List<MenuDTO>> getMenusOfRestaurant(@RequestParam Integer days) {
+    @GetMapping("/{restaurant_id}/menus")
+    public ResponseEntity<List<MenuDTO>> getMenusOfRestaurant(
+        @PathVariable Integer restaurantId,
+        @RequestBody LocalDate from,
+        @RequestBody LocalDate to
+    ) {
         return new ResponseEntity<>(null, HttpStatus.NOT_IMPLEMENTED);
     }
 }

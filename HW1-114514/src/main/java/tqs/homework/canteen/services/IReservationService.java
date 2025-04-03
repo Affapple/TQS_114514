@@ -1,12 +1,12 @@
 package tqs.homework.canteen.services;
 
-import tqs.homework.canteen.DTOs.ReservationDTO;
 import tqs.homework.canteen.DTOs.ReservationRequestDTO;
+import tqs.homework.canteen.entities.Reservation;
 
 public interface IReservationService {
-    public ReservationDTO createReservation(ReservationRequestDTO requestDTO);
-    public ReservationDTO getReservationByCode(String code);
-    public ReservationDTO cancelReservation(String code);
-    public ReservationDTO checkInReservation(String code);
+    public Reservation createReservation(ReservationRequestDTO requestDTO);
+    public Reservation getReservationByCode(String code);
+    public Reservation cancelReservation(String code);
+    public Reservation checkInReservation(String code);
 }
 
