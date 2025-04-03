@@ -10,9 +10,9 @@ import tqs.homework.canteen.entities.Menu;
 
 public interface IMenuService {
     public Menu createNewMenu(MenuRequestDTO menuRequest);
-    public Menu addMeal(Integer menuId, MealDTO meal);
-    public Menu addMeals(Integer menuId, List<Meal> meals);
-    public List<Meal> getMeals(Integer menuId);
-    public List<Meal> getMealsByRestaurantId(Long restaurantId);
-    public List<Meal> getMealsOfRestaurantBetweenDates(Long restaurantId, LocalDate from, LocalDate to);
+    public Menu addMeal(MealDTO meal);
+    public Menu addMeals(Long menuId, List<MealDTO> meals);
+    public List<Meal> getMeals(Long menuId);
+    public List<Menu> getMenusByRestaurantId(Long restaurantId);
+    public List<Menu> getMenusOfRestaurantBetweenDates(Long restaurantId, LocalDate from, LocalDate to);
 }

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import tqs.homework.canteen.EnumTypes.MenuTime;
 import tqs.homework.canteen.EnumTypes.MealType;
 
 @AllArgsConstructor
@@ -12,7 +11,7 @@ import tqs.homework.canteen.EnumTypes.MealType;
 @Setter
 @Getter
 public class MealDTO {
-    private Long id;
+    private Long menuId;
     private String description;
     private MealType type;
 }

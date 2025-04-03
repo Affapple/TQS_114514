@@ -10,11 +10,9 @@ import tqs.homework.canteen.EnumTypes.ReservationStatus;
 import tqs.homework.canteen.entities.Meal;
 import tqs.homework.canteen.entities.Menu;
 import tqs.homework.canteen.entities.Reservation;
-import tqs.homework.canteen.entities.Restaurant;
 import tqs.homework.canteen.repositories.MealRepository;
 import tqs.homework.canteen.repositories.MenuRepository;
 import tqs.homework.canteen.repositories.ReservationRepository;
-import tqs.homework.canteen.repositories.RestaurantRepository;
 
 @Service
 public class ReservationService implements IReservationService {

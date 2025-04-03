@@ -1,5 +1,6 @@
 package tqs.homework.canteen.entities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -25,5 +26,11 @@ public class Meal {
     private Menu menu;
     
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL)
-    private List<Reservation> reservations;
+    private List<Reservation> reservations = new ArrayList<>();
+
+    public Meal(String description, MealType type, Menu menu) {
+        this.description = description;
+        this.type = type;
+        this.menu = menu;
+    }
 }

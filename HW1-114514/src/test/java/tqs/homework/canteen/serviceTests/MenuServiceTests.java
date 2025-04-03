@@ -1,22 +1,22 @@
 package tqs.homework.canteen.serviceTests;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
-import org.checkerframework.checker.units.qual.t;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -45,168 +45,436 @@ class MenuServiceTests {
     @InjectMocks
     private MenuService menuService;
 
-    private Restaurant testRestaurant;
-    private Menu testMenu;
-    private Meal testMeal;
-    private MenuRequestDTO testMenuRequestDTO;
-    private MealDTO testMealDTO;
-
     @BeforeEach
     public void setup() {
-        testRestaurant = new Restaurant();
-        testRestaurant.setId(1L);
-        testRestaurant.setName("Test Restaurant");
-        testRestaurant.setLocation("Test Location");
-        testRestaurant.setCapacity(3);
-
-        testMenu = new Menu();
-        testMenu.setId(1L);
-        testMenu.setDate(LocalDate.now());
-        testMenu.setTime(MenuTime.LUNCH);
-        testMenu.setRestaurant(testRestaurant);
-
-        testMeal = new Meal();
-        testMeal.setId(1L);
-        testMeal.setDescription("Test Meal");
-        testMeal.setType(MealType.MEAT);
-        testMeal.setMenu(testMenu);
-
-        testMealDTO = new MealDTO();
-        testMealDTO.setId(1L);
-        testMealDTO.setDescription("Test Meal");
-        testMealDTO.setType(MealType.MEAT);
-
-        testMenuRequestDTO = new MenuRequestDTO();
-        testMenuRequestDTO.setRestaurantId(1L);
-        testMenuRequestDTO.setDate(LocalDate.now());
-        testMenuRequestDTO.setTime(MenuTime.LUNCH);
-        testMenuRequestDTO.setOptions(Arrays.asList(testMealDTO));
     }
 
+    /* METHOD: addMeal */
+    /**
+     * Given menu doesnt exits
+     * when add meal
+     * then throw NoSuchElement
+     */
     @Test
-    void whenCreateNewMenu_thenMenuShouldBeCreated() {
-        when(restaurantRepository.findById(1L)).thenReturn(java.util.Optional.of(testRestaurant));
-        when(menuRepository.save(any(Menu.class))).thenReturn(testMenu);
+    public void whenAddMealToNonExistentMenu_thenThrowError() {
+        Long nonExistentMenuID = 10L;
+        when(menuRepository.findById(nonExistentMenuID)).thenReturn(Optional.empty());
 
-        Menu createdMenu = menuService.createNewMenu(testMenuRequestDTO);
+        MealDTO mealDTO = new MealDTO(nonExistentMenuID, "New tasty meal", MealType.MEAT);
 
-        assertNotNull(createdMenu);
-        assertEquals(testRestaurant, createdMenu.getRestaurant());
-        assertEquals(testMenuRequestDTO.getDate(), createdMenu.getDate());
-        assertEquals(testMenuRequestDTO.getTime(), createdMenu.getTime());
-        verify(restaurantRepository).findById(1L);
-        verify(menuRepository).save(any(Menu.class));
-    }
-
-    @Test
-    void whenCreateNewMenuWithInvalidRestaurant_thenExceptionShouldBeThrown() {
-        when(restaurantRepository.findById(1L)).thenReturn(java.util.Optional.empty());
-
-        assertThrows(NoSuchElementException.class, () -> {
-            menuService.createNewMenu(testMenuRequestDTO);
-        });
-
-        verify(restaurantRepository).findById(1L);
-        verify(menuRepository, never()).save(any(Menu.class));
-    }
-
-    @Test
-    void whenAddMeal_thenMealShouldBeAdded() {
-        when(menuRepository.findById(1L)).thenReturn(java.util.Optional.of(testMenu));
-        when(menuRepository.save(any(Menu.class))).thenReturn(testMenu);
-
-        Menu updatedMenu = menuService.addMeal(1, testMealDTO);
-
-        assertNotNull(updatedMenu);
-        assertThat(updatedMenu.getOptions(), hasItem(testMeal));
-        verify(menuRepository).findById(1L);
-        verify(menuRepository).save(any(Menu.class));
-    }
-
-    @Test
-    void whenAddMealToInvalidMenu_thenExceptionShouldBeThrown() {
-        when(menuRepository.findById(1L)).thenReturn(java.util.Optional.empty());
-
-        assertThrows(NoSuchElementException.class, () -> {
-            menuService.addMeal(1, testMealDTO);
-        });
-        verify(menuRepository).findById(1L);
-        verify(menuRepository, never()).save(any(Menu.class));
-    }
-
-    @Test
-    void whenAddMeals_thenMealsShouldBeAdded() {
-        List<Meal> newMeals = Arrays.asList(
-            new Meal(null, "Soup", MealType.SOUP, null, null),
-            new Meal(null, "Fish", MealType.FISH, null, null)
+        assertThrowsExactly(
+            NoSuchElementException.class,
+            () -> menuService.addMeal(mealDTO),
+            "No error thrown when added meal to a non-existent menu!"
         );
-        when(menuRepository.findById(1L)).thenReturn(java.util.Optional.of(testMenu));
-        when(menuRepository.save(any(Menu.class))).thenReturn(testMenu);
-
-        Menu updatedMenu = menuService.addMeals(1, newMeals);
-
-        assertNotNull(updatedMenu);
-        assertThat(updatedMenu.getOptions(), containsInAnyOrder(newMeals));
-        verify(menuRepository).findById(1L);
-        verify(menuRepository).save(any(Menu.class));
     }
 
+    /*
+     * Given menu exist 
+     *    and meal of type already exists
+     * when add meal
+     * then throw illegal Argument exception
+     */
     @Test
-    void whenAddMealsToInvalidMenu_thenExceptionShouldBeThrown() {
-        List<Meal> newMeals = Arrays.asList(
-            new Meal(null, "Soup", MealType.SOUP, null, null),
-            new Meal(null, "Fish", MealType.FISH, null, null)
+    public void whenAddMealOfSameType_thenThrowError() {
+        Long existentMenuID = 1L;
+        Menu existentMenu = new Menu(
+            existentMenuID,
+            LocalDate.now(),
+            MenuTime.LUNCH,
+            10,
+            new Restaurant(1L, "Test Restaurant", "Test Location", 10, new ArrayList<>()),
+            new ArrayList<>()
         );
-        when(menuRepository.findById(1L)).thenReturn(java.util.Optional.empty());
 
-        assertThrows(NoSuchElementException.class, () -> {
-            menuService.addMeals(1, newMeals);
-        });
-        verify(menuRepository).findById(1L);
-        verify(menuRepository, never()).save(any(Menu.class));
-    }
+        when(menuRepository.findById(existentMenuID)).thenReturn(Optional.of(existentMenu));
 
-    @Test
-    void whenGetMeals_thenMealsShouldBeReturned() {
-        when(menuRepository.findById(1L)).thenReturn(java.util.Optional.of(testMenu));
+        MealDTO mealDTO = new MealDTO(existentMenuID, "New tasty meal", MealType.MEAT);
+        menuService.addMeal(mealDTO);
 
-        List<Meal> foundMeals = menuService.getMeals(1);
+        MealDTO repeatedMealDTO = new MealDTO(existentMenuID, "Another tasty meal", MealType.MEAT);
 
-        assertNotNull(foundMeals);
-        assertEquals(testMenu.getOptions(), foundMeals);
-        verify(menuRepository).findById(1L);
-    }
-
-    @Test
-    void whenGetMealsFromInvalidMenu_thenExceptionShouldBeThrown() {
-        when(menuRepository.findById(1L)).thenReturn(java.util.Optional.empty());
-
-        assertThrows(NoSuchElementException.class, () -> {
-            menuService.getMeals(1);
-        });
-        verify(menuRepository).findById(1L);
-        verify(menuRepository, never()).save(any(Menu.class));
-    }
-
-    @Test
-    void whenAddMealOfRepeatedType_thenExceptionShouldBeThrown() {
-        when(menuRepository.findById(1L)).thenReturn(java.util.Optional.of(testMenu));
-        when(menuRepository.save(any(Menu.class))).thenReturn(testMenu);
-
-        MealDTO repeatedMealDTO = new MealDTO();
-        repeatedMealDTO.setId(2l);
-        repeatedMealDTO.setDescription("Repeated Meat");
-        repeatedMealDTO.setType(MealType.MEAT);
-
-        assertThrows(IllegalStateException.class, () -> {
-            menuService.addMeal(1, repeatedMealDTO);
-        });
-        verify(menuRepository).existsMealOfThisType(
-            testRestaurant.getId(),
-            testMenu.getDate(),
-            testMenu.getTime(),
-            repeatedMealDTO.getType()
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> menuService.addMeal(repeatedMealDTO),
+            "No error thrown when added meal of same type!"
         );
-        verify(menuRepository, never()).save(any(Menu.class));
+    }
+
+
+    /*
+     * Given menu exists
+     *    and when meal of type doesnt exists
+     * when add meal
+     * then add meal
+     */
+    @Test
+    public void whenAddMealToExistentMenu_thenAddMeal() {
+        Long existentMenuID = 1L;
+        Menu existentMenu = new Menu(
+            existentMenuID,
+            LocalDate.now(),
+            MenuTime.LUNCH,
+            10,
+            new Restaurant(1L, "Test Restaurant", "Test Location", 10, new ArrayList<>()),
+            new ArrayList<>()
+        );
+
+        when(menuRepository.findById(existentMenuID)).thenReturn(Optional.of(existentMenu));
+        when(menuRepository.save(Mockito.any(Menu.class))).thenReturn(existentMenu);
+
+        MealDTO mealDTO = new MealDTO(existentMenuID, "New tasty meal", MealType.MEAT);
+
+        Menu updatedMenu = menuService.addMeal(mealDTO);
+        Meal addedMeal = updatedMenu.getOptions().getFirst();
+
+        assertEquals(mealDTO.getDescription(), addedMeal.getDescription());
+        assertEquals(mealDTO.getType(), addedMeal.getType());
+        assertEquals(existentMenu, addedMeal.getMenu());
+        assertThat(addedMeal.getReservations(), is(empty()));
+    }
+
+
+    /* METHOD: createNewMenu */
+    /**
+     * Given restaurant doesnt exists
+     * when createNewMenu to restaurant
+     * then throw NoSuchElement
+     */
+    @Test
+    public void whenCreateMenuInNonExistentRestaurant_thenThrowError() {
+        when(restaurantRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        MenuRequestDTO menuRequest = new MenuRequestDTO(
+            10l,
+            new ArrayList<>(),
+            LocalDate.now(),
+            MenuTime.LUNCH
+        );
+
+        assertThrowsExactly(
+            NoSuchElementException.class,
+            () -> menuService.createNewMenu(menuRequest),
+            "No error thrown when attempting to create new menu at non-existent restaurant!"
+        );
+    }
+    /**
+     * Given resttaurant exists
+     * when menu for given date and time table dont exists
+     * then create new menu
+     */
+    @Test
+    public void whenAddingNewMenu_thenMenuIsAdded() {
+        Restaurant restaurant = new Restaurant(10l, "Test Restaurant", "Test Location", 10, new ArrayList<>());
+        when(restaurantRepository.findById(anyLong())).thenReturn(Optional.of(restaurant));
+        when(restaurantRepository.save(Mockito.any(Restaurant.class))).thenReturn(restaurant);
+        when(menuRepository.save(Mockito.any(Menu.class))).thenReturn(new Menu(LocalDate.now(), MenuTime.LUNCH, restaurant));
+        
+        MenuRequestDTO menuRequest = new MenuRequestDTO(
+            10l,
+            new ArrayList<>(),
+            LocalDate.now(),
+            MenuTime.LUNCH
+        );
+        Menu newMenu = menuService.createNewMenu(menuRequest);
+        assertThat(
+            newMenu,
+            is(not(nullValue()))
+        );
+        assertThat(newMenu.getRestaurant(), is(restaurant));
+        assertThat(newMenu.getOptions(), hasSize(0));
+    }
+
+    /**
+     * Given resttaurant exists
+     * when menu for given date and time table already exists
+     * then throw IllegalArgException
+     */
+    @Test
+    public void whenAddingNewAlreadyExistingMenu_thenThrowError() {
+        Restaurant restaurant = new Restaurant(10l, "Test Restaurant", "Test Location", 10, new ArrayList<>());
+        when(restaurantRepository.findById(anyLong())).thenReturn(Optional.of(restaurant));
+
+        restaurant
+          .getMenus()
+          .add(
+            new Menu(LocalDate.now(), MenuTime.LUNCH, restaurant)
+        );
+
+        MenuRequestDTO repeatedMenuRequest = new MenuRequestDTO(
+            10l,
+            new ArrayList<>(),
+            LocalDate.now(),
+            MenuTime.LUNCH
+        );
+
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> menuService.createNewMenu(repeatedMenuRequest),
+            "No error thrown when attempting to create a menu of the same type and date at restaurant!"
+        );
+    }
+
+
+    /* METHOD: getMeals */ 
+    /**
+     * Given menu doesnt exists when get meals
+     * then throw NoSuchElement
+     */
+    @Test
+    public void whenGettingMealsOfNonExistentMenu_thenThrowError() {
+        when(menuRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrowsExactly(
+            NoSuchElementException.class,
+            () -> menuService.getMeals(anyLong()),
+             "No error thrown when attempting to get meals of non-existent menu!"
+        );
+    }
+
+    /*
+     * Given menu exists
+     *  and menu it has no meals
+     * when get meals
+     * then return empty list
+     */
+    @Test
+    public void whenGettingMealsOfMenuWithNoMeals_thenReturnEmptyList() {
+        Menu menu = new Menu(
+            1L,
+            LocalDate.now(),
+            MenuTime.LUNCH,
+            10,
+            new Restaurant(1L, "Test Restaurant", "Test Location", 10, new ArrayList<>()), 
+            new ArrayList<>()
+        );
+        when(menuRepository.findById(anyLong())).thenReturn(Optional.of(menu));
+
+        assertThat(
+            menuService.getMeals(1L),
+            is(empty())
+        );
+    }
+    /*
+     * Given menu exists
+     *  and it has meals 
+     * when get meals
+     * then return list of meals
+     */
+    @Test
+    public void whenGettingMealsOfMenuWithMeals_thenReturnListOfMeals() {
+        Restaurant restaurant = new Restaurant(1L, "Test Restaurant", "Test Location", 10, new ArrayList<>());
+        Menu menu = new Menu(
+            1L,
+            LocalDate.now(),
+            MenuTime.LUNCH,
+            10,
+            restaurant,
+            new ArrayList<>()
+        );
+        when(menuRepository.save(Mockito.any(Menu.class)))
+        .thenReturn(menu);
+        when(menuRepository.findById(1l))
+        .thenReturn(Optional.of(menu));
+
+        menuService.addMeal(new MealDTO(1L, "Meal 1", MealType.MEAT));
+        menuService.addMeal(new MealDTO(1L, "Meal 2", MealType.FISH));
+
+        when(menuRepository.findById(anyLong())).thenReturn(Optional.of(menu));
+
+        List<Meal> meals = menuService.getMeals(1L);
+        assertThat(
+            meals,
+            is(not(empty()))
+        );
+        assertThat(meals.size(), is(2));
+    }
+
+    /* getMenusByRestaurantId */ 
+    /**
+     * Given resaurant doesnt exists
+     * when get menus
+     * then throw NoSuchElement
+     */
+    @Test
+    public void whenGettingMealsOfNonExistentRestaurant_thenThrowError() {
+        when(restaurantRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrowsExactly(
+            NoSuchElementException.class,
+            () -> menuService.getMenusByRestaurantId(anyLong()),
+            "No error thrown when attempting to get menus of non-existent restaurant!"
+        );
+    }
+    /* Given restaurant exists
+     *  and restaurant has no menus
+     * when get menus
+     * then return empty list
+     */
+    @Test
+    public void whenGettingMenusOfRestaurantWithNoMenus_thenReturnEmptyList() {
+        List<Menu> menus = new ArrayList<>();
+        Restaurant restaurant = new Restaurant(1L, "Test Restaurant", "Test Location", 10, menus);
+        when(restaurantRepository.findById(1L)).thenReturn(Optional.of(restaurant));
+        when(restaurantRepository.existsById(1L)).thenReturn(true);
+        when(menuRepository.findByRestaurant_id(1L)).thenReturn(menus);
+
+        assertThat(
+            menuService.getMenusByRestaurantId(1L),
+            is(empty())
+        );
+    }
+
+    /* Given restaurant exists
+     *  and it has menus
+     * when get menus
+     * then return list of menus
+     */
+    @Test
+    public void whenGettingMenusOfRestaurantWithMenus_thenReturnListOfMenus() {
+        Restaurant restaurant = new Restaurant(1L, "Test Restaurant", "Test Location", 10, new ArrayList<>());
+        when(restaurantRepository.findById(1L)).thenReturn(Optional.of(restaurant));
+        when(restaurantRepository.existsById(1L)).thenReturn(true);
+
+        Menu menu1 = new Menu(1L, LocalDate.now(), MenuTime.LUNCH, 10, restaurant, new ArrayList<>());
+        Menu menu2 = new Menu(2L, LocalDate.now(), MenuTime.DINNER, 10, restaurant, new ArrayList<>());
+
+        when(menuRepository.findByRestaurant_id(1L)).thenReturn(List.of(menu1, menu2));
+
+        assertThat(
+            menuService.getMenusByRestaurantId(1L),
+            hasSize(2)
+        );
+    }
+
+    /* getMenusOfRestaurantBetweenDate */
+    /**
+     * Given resaurant doesnt exists
+     * when get meals
+     * then throw NoSuchElement
+     */
+    @Test
+    public void whenGettingMenusOfNonExistentRestaurantByDate_thenThrowError() {
+        when(restaurantRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrowsExactly(
+            NoSuchElementException.class,
+            () -> menuService.getMenusOfRestaurantBetweenDates(
+                10L,
+                LocalDate.now(),
+                LocalDate.now().plusDays(1)
+            ),
+            "No error thrown when attempting to get meals of non-existent restaurant!"
+        );
+    }
+    /* Given restaurant exists
+     *  and restaurant has no menus in the time range 
+     * when get meals
+     * then return empty list
+     */
+    @Test
+    public void whenGettingMenusOfRestaurantWithNoMenusInTimeRange_thenReturnEmptyList() {
+        Restaurant restaurant = new Restaurant(1L, "Test Restaurant", "Test Location", 10, new ArrayList<>());
+        when(restaurantRepository.findById(anyLong())).thenReturn(Optional.of(restaurant));
+
+        assertThrowsExactly(
+            NoSuchElementException.class,
+            () -> menuService.getMenusOfRestaurantBetweenDates(
+                10L,
+                LocalDate.now(),
+                LocalDate.now().plusDays(1)
+            ),
+            "No error thrown when attempting to get menus of restaurant with no menus in time range!"
+        );
+    }
+
+    /* Given restaurant exists
+     *  and it has menus in the time rang
+     * when get meals
+     * then return list of menus
+     */
+    @Test
+    public void whenGettingMenusOfRestaurantWithMenusInTimeRange_thenReturnListOfMenus() {
+        Restaurant restaurant = new Restaurant(1L, "Test Restaurant", "Test Location", 10, new ArrayList<>());
+        when(restaurantRepository.findById(anyLong())).thenReturn(Optional.of(restaurant));
+        when(restaurantRepository.existsById(anyLong())).thenReturn(true);
+        Menu menu1 = new Menu(1L, LocalDate.now(), MenuTime.LUNCH, 10, restaurant, new ArrayList<>());
+        Menu menu2 = new Menu(2L, LocalDate.now(), MenuTime.DINNER, 10, restaurant, new ArrayList<>());
+        when(
+            menuRepository
+              .findByRestaurant_idAndDateBetween(
+                anyLong(),
+                Mockito.any(LocalDate.class),
+                Mockito.any(LocalDate.class)
+            )
+        ).thenReturn(List.of(menu1, menu2));
+        
+        when(menuRepository.findByRestaurant_id(anyLong())).thenReturn(List.of(menu1, menu2));
+
+        assertThat(
+            menuService.getMenusOfRestaurantBetweenDates(1L, LocalDate.now(), LocalDate.now().plusDays(1)),
+            hasSize(2)
+        );
+    }
+    /*
+     * Given restaurant exists
+     *  and <from> is null
+     * when get meals until <to>
+     * then return all list of menus before <to>
+     */
+    @Test
+    public void whenGettingMenusOfRestaurantWithMenusInTimeRangeFromNull_thenReturnListOfMenus() {
+        Restaurant restaurant = new Restaurant(1L, "Test Restaurant", "Test Location", 10, new ArrayList<>());
+        when(restaurantRepository.findById(anyLong())).thenReturn(Optional.of(restaurant));
+        when(restaurantRepository.existsById(anyLong())).thenReturn(true);
+        
+        Menu menu1 = new Menu(1L, LocalDate.now(), MenuTime.LUNCH, 10, restaurant, new ArrayList<>());
+        Menu menu2 = new Menu(2L, LocalDate.now().plusDays(1), MenuTime.DINNER, 10, restaurant, new ArrayList<>());
+        when(
+            menuRepository
+              .findByRestaurant_idAndDateBetween(
+                anyLong(),
+                Mockito.any(LocalDate.class),
+                Mockito.any(LocalDate.class)
+            )
+        ).thenReturn(List.of(menu1));
+        
+        when(menuRepository.findByRestaurant_id(anyLong())).thenReturn(List.of(menu1, menu2));
+
+        assertThat(
+            menuService.getMenusOfRestaurantBetweenDates(1L, null, LocalDate.now()),
+            hasSize(1)
+        );
+    }
+    /* Given restaurant exists
+     *  and <to> is null
+     * when get meals from <from>
+     * then return all list of menus starting <from> until forever
+     */
+    @Test
+    public void whenGettingMenusOfRestaurantWithMenusInTimeRangeToNull_thenReturnListOfMenus() {
+        Restaurant restaurant = new Restaurant(1L, "Test Restaurant", "Test Location", 10, new ArrayList<>());
+        when(restaurantRepository.findById(anyLong())).thenReturn(Optional.of(restaurant));
+        when(restaurantRepository.existsById(anyLong())).thenReturn(true);
+
+        Menu menu1 = new Menu(1L, LocalDate.now(), MenuTime.LUNCH, 10, restaurant, new ArrayList<>());
+        Menu menu2 = new Menu(2L, LocalDate.now().plusDays(1), MenuTime.DINNER, 10, restaurant, new ArrayList<>());
+        when(menuRepository.findByRestaurant_id(anyLong())).thenReturn(List.of(menu1, menu2));        
+        when(
+            menuRepository
+              .findByRestaurant_idAndDateBetween(
+                anyLong(),
+                Mockito.any(LocalDate.class),
+                Mockito.any(LocalDate.class)
+            )
+        ).thenReturn(List.of(menu2));
+        
+        when(menuRepository.findByRestaurant_id(anyLong())).thenReturn(List.of(menu1, menu2));
+
+        assertThat(
+            menuService.getMenusOfRestaurantBetweenDates(1L, LocalDate.now().plusDays(1), null),
+            hasSize(1)
+        );
     }
 }
+

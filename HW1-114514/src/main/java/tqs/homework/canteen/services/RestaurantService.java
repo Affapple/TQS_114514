@@ -1,6 +1,7 @@
 package tqs.homework.canteen.services;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,8 @@ public class RestaurantService implements IRestaurantService {
 
     @Override
     public Restaurant getRestaurantById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getRestaurantById'");
+        return restaurantRepository.findById(id).orElseThrow(
+            () -> new NoSuchElementException("Restaurant not found!")
+        );
     }
 }
