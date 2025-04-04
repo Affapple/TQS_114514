@@ -25,8 +25,11 @@ public class MenuController {
 
     @PostMapping
     public ResponseEntity<Menu> createNewMenu(MenuRequestDTO menuRequest) {
+        Menu menu = menuService.createNewMenu(menuRequest);
+        Menu finalMenu = menuService.addMeals(menu.getId(), menuRequest.getOptions());
+        
         return new ResponseEntity<>(
-            menuService.createNewMenu(menuRequest),
+            finalMenu,
             HttpStatus.CREATED
         );
     }

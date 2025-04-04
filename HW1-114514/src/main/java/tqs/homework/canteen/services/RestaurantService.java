@@ -5,11 +5,12 @@ import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import tqs.homework.canteen.entities.Restaurant;
 import tqs.homework.canteen.repositories.RestaurantRepository;
 
 @Service
+@Transactional
 public class RestaurantService implements IRestaurantService {
 
     @Autowired

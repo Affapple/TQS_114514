@@ -2,34 +2,144 @@ package tqs.homework.canteen.IntegrationTests;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 
-import static org.hamcrest.CoreMatchers.*;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import jakarta.transaction.Transactional;
+
+import static io.restassured.RestAssured.*;
+import static io.restassured.matcher.RestAssuredMatchers.*;
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import tqs.homework.canteen.TestcontainersConfiguration;
+import tqs.homework.canteen.DTOs.MealDTO;
+import tqs.homework.canteen.DTOs.MenuRequestDTO;
 import tqs.homework.canteen.DTOs.ReservationRequestDTO;
+import tqs.homework.canteen.EnumTypes.MealType;
 import tqs.homework.canteen.EnumTypes.MenuTime;
 import tqs.homework.canteen.EnumTypes.ReservationStatus;
-import tqs.homework.canteen.controller.ReservationController;
+import tqs.homework.canteen.entities.Menu;
 import tqs.homework.canteen.entities.Reservation;
+import tqs.homework.canteen.entities.Restaurant;
+import tqs.homework.canteen.repositories.ReservationRepository;
+import tqs.homework.canteen.services.MenuService;
 import tqs.homework.canteen.services.ReservationService;
+import tqs.homework.canteen.services.RestaurantService;
 
-@WebMvcTest(ReservationController.class)
+@Import(TestcontainersConfiguration.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ReservationControllerTestsIT {
-    @Autowired
-    private MockMvc mvc;
+    @LocalServerPort
+    int randomServerPort;
+
+    @DynamicPropertySource
+    static void properties(DynamicPropertyRegistry registry) {
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+    }
     
     @Autowired
     private ReservationService reservationService;
+    @Autowired
+    private RestaurantService restaurantService;
+    @Autowired
+    private MenuService menuService;
+    @Autowired
+    private ReservationRepository reservationRepository;
+
+    Restaurant castro, grelhados, santiago;
+    Reservation validReservation;
+    @BeforeEach
+    public void setUp() {
+        RestAssured.baseURI = "http://localhost";
+        RestAssured.port = randomServerPort;
+        
+        castro = restaurantService.saveNewRestaurant(new Restaurant("Castro", "Castro", 1));
+        grelhados = restaurantService.saveNewRestaurant(new Restaurant("Grelhados", "Grelhados", 1));
+        santiago = restaurantService.saveNewRestaurant(new Restaurant("Santiago", "Santiago", 1));
+
+        /* CASTRO */
+        menuService.createNewMenu(new MenuRequestDTO(
+            castro.getId(), 
+            List.of(
+                new MealDTO(null, "Meal 1 Soup Lunch", MealType.SOUP),
+                new MealDTO(null, "Meal 1 Meat Lunch", MealType.MEAT),
+                new MealDTO(null, "Meal 1 Fish Lunch", MealType.FISH)
+            ),
+            LocalDate.of(2025, 4, 1),
+            MenuTime.LUNCH
+        ));
+        menuService.createNewMenu(new MenuRequestDTO(
+            castro.getId(), 
+            List.of(
+                new MealDTO(null, "Meal 2 Soup Dinner", MealType.SOUP),
+                new MealDTO(null, "Meal 2 Meat Dinner", MealType.MEAT),
+                new MealDTO(null, "Meal 2 Fish Dinner", MealType.FISH)
+            ),
+            LocalDate.of(2025, 4, 1),
+            MenuTime.DINNER
+        ));
+
+        menuService.createNewMenu(new MenuRequestDTO(
+            castro.getId(), 
+            List.of(
+                new MealDTO(null, "Meal 3 Soup Lunch", MealType.SOUP),
+                new MealDTO(null, "Meal 3 Meat Lunch", MealType.MEAT),
+                new MealDTO(null, "Meal 3 Fish Lunch", MealType.FISH)
+            ),
+            LocalDate.of(2025, 4, 2),
+            MenuTime.LUNCH
+        ));
+
+        /* GRELHADOS */
+        menuService.createNewMenu(new MenuRequestDTO(
+            grelhados.getId(), 
+            List.of(
+                new MealDTO(null, "Meal 1 Soup Lunch", MealType.SOUP),
+                new MealDTO(null, "Meal 1 Meat Lunch", MealType.MEAT),
+                new MealDTO(null, "Meal 1 Fish Lunch", MealType.FISH)
+            ),
+            LocalDate.of(2025, 4, 1),
+            MenuTime.LUNCH
+        ));
+
+        menuService.createNewMenu(new MenuRequestDTO(
+            grelhados.getId(), 
+            List.of(
+                new MealDTO(null, "Meal 2 Soup Dinner", MealType.SOUP),
+                new MealDTO(null, "Meal 2 Meat Dinner", MealType.MEAT),
+                new MealDTO(null, "Meal 2 Fish Dinner", MealType.FISH)
+            ),
+            LocalDate.of(2025, 4, 1),
+            MenuTime.DINNER
+        ));
+        menuService.createNewMenu(new MenuRequestDTO(
+            grelhados.getId(), 
+            List.of(
+                new MealDTO(null, "Meal 3 Soup Dinner", MealType.SOUP),
+                new MealDTO(null, "Meal 3 Meat Dinner", MealType.MEAT),
+                new MealDTO(null, "Meal 3 Fish Dinner", MealType.FISH)
+            ),
+            LocalDate.of(2025, 4, 1),
+            MenuTime.DINNER
+        ));
+
+        Menu menu = menuService.getMenusByRestaurantId(castro.getId()).getFirst();
+
+        validReservation = reservationService.createReservation(
+            new ReservationRequestDTO(menu.getOptions().getFirst().getId())
+        );
+    }
     
     /* GET: /api/v1/reservations */
     /**
@@ -38,11 +148,12 @@ public class ReservationControllerTestsIT {
      * then an NoSuchElementException is thrown
      */
     @Test
+    @Transactional
     public void testGetReservationByCode_InvalidCode() throws Exception {
-        when(reservationService.getReservationByCode("invalidCode")).thenThrow(new NoSuchElementException());
-
-        mvc.perform(get("/api/v1/reservations/invalidCode"))
-            .andExpect(status().isNotFound());
+        when()
+            .get("/api/v1/reservations/invalidCode")
+        .then()
+            .statusCode(404);
     }
 
     /**
@@ -52,13 +163,11 @@ public class ReservationControllerTestsIT {
      */
     @Test
     public void testGetReservationByCode_ValidCode() throws Exception {
-        Reservation reservation = new Reservation();
-        reservation.setCode("validCode");
-        when(reservationService.getReservationByCode("validCode")).thenReturn(reservation);
-
-        mvc.perform(get("/api/v1/reservations/validCode"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.code").value("validCode"));
+        when()
+            .get("/api/v1/reservations/" + validReservation.getCode())
+        .then()
+            .statusCode(200)
+            .body("code", is(validReservation.getCode()));
     }
 
     /* POST: /api/v1/reservations */
@@ -69,15 +178,13 @@ public class ReservationControllerTestsIT {
      */
     @Test
     public void testCreateReservation_InvalidMealId() throws Exception {
-        when(reservationService.createReservation(Mockito.any(ReservationRequestDTO.class)))
-        .thenThrow(new NoSuchElementException());
-
-        mvc.perform(
-            post("/api/v1/reservations")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content("{\"mealId\": 1}")
-        )
-            .andExpect(status().isNotFound());
+        given()
+            .contentType(ContentType.JSON)
+            .body("{\"mealId\": -1}")
+        .when()
+            .post("/api/v1/reservations")
+        .then()
+            .statusCode(404);
     }
 
     /**
@@ -87,21 +194,14 @@ public class ReservationControllerTestsIT {
      */
     @Test
     public void testCreateReservation_ValidMealId() throws Exception {
-        ReservationRequestDTO requestDTO = new ReservationRequestDTO();
-        requestDTO.setMealId(1L);
-
-        Reservation reservation = new Reservation();
-        reservation.setCode("12345678");
-        when(reservationService.createReservation(Mockito.any(ReservationRequestDTO.class)))
-        .thenReturn(reservation);
-        
-        mvc.perform(
-            post("/api/v1/reservations")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content("{\"mealId\": 1}")
-        )
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.code").value("12345678"));
+        given()
+            .contentType(ContentType.JSON)
+            .body("{\"mealId\": " + validReservation.getMeal().getId() + "}")
+        .when()
+            .post("/api/v1/reservations")
+        .then()
+            .statusCode(201)
+            .body("code", notNullValue());
     }
 
     /**
@@ -111,15 +211,22 @@ public class ReservationControllerTestsIT {
      */
     @Test
     public void testCreateReservation_NoFreeCapacity() throws Exception {
-        when(reservationService.createReservation(Mockito.any(ReservationRequestDTO.class)))
-        .thenThrow(new IllegalStateException());
+        // Valid reservation but after this one, the capacity will be 0
+        given()
+            .contentType(ContentType.JSON)
+            .body("{\"mealId\": " + validReservation.getMeal().getId() + "}")
+        .when()
+            .post("/api/v1/reservations")
+        .then()
+            .statusCode(201);
 
-        mvc.perform(
-            post("/api/v1/reservations")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content("{\"mealId\": 1}")
-        )
-            .andExpect(status().isBadRequest());
+        given()
+            .contentType(ContentType.JSON)
+            .body("{\"mealId\": " + validReservation.getMeal().getId() + "}")
+        .when()
+            .post("/api/v1/reservations")
+        .then()
+            .statusCode(400);
     }
 
     /* DELETE: /api/v1/reservations/{reservation_id} */
@@ -130,10 +237,10 @@ public class ReservationControllerTestsIT {
      */
     @Test
     public void testCancelReservation_InvalidCode() throws Exception {
-        when(reservationService.cancelReservation("invalidCode")).thenThrow(new NoSuchElementException());
-
-        mvc.perform(delete("/api/v1/reservations/invalidCode"))
-            .andExpect(status().isNotFound());
+        when()
+            .delete("/api/v1/reservations/invalidCode")
+        .then()
+            .statusCode(404);
     }
     /**
      * Given a valid code and a reservation with status ACTIVE
@@ -142,13 +249,11 @@ public class ReservationControllerTestsIT {
      */
     @Test
     public void testCancelReservation_ValidCode() throws Exception {
-        Reservation reservation = new Reservation();
-        reservation.setStatus(ReservationStatus.CANCELLED);
-        when(reservationService.cancelReservation("validCode")).thenReturn(reservation);
-
-        mvc.perform(delete("/api/v1/reservations/validCode"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status").value("cancelled"));
+        when()
+            .delete("/api/v1/reservations/" + validReservation.getCode())
+        .then()
+            .statusCode(200)
+            .body("status", is("cancelled"));
     }
 
     /**
@@ -158,10 +263,13 @@ public class ReservationControllerTestsIT {
      */
     @Test
     public void testCancelReservation_UsedStatus() throws Exception {
-        when(reservationService.cancelReservation("usedCode")).thenThrow(new IllegalStateException());
+        validReservation.setStatus(ReservationStatus.USED);
+        reservationRepository.save(validReservation);
 
-        mvc.perform(delete("/api/v1/reservations/usedCode"))
-            .andExpect(status().isBadRequest());
+        when()
+            .delete("/api/v1/reservations/" + validReservation.getCode())
+        .then()
+            .statusCode(400);
     }
 
     /**
@@ -171,10 +279,13 @@ public class ReservationControllerTestsIT {
      */
     @Test
     public void testCancelReservation_CancelledStatus() throws Exception {
-        when(reservationService.cancelReservation("cancelledCode")).thenThrow(new IllegalStateException());
+        validReservation.setStatus(ReservationStatus.CANCELLED);
+        reservationRepository.save(validReservation);
 
-        mvc.perform(delete("/api/v1/reservations/cancelledCode"))
-            .andExpect(status().isBadRequest());
+        when()
+            .delete("/api/v1/reservations/" + validReservation.getCode())
+        .then()
+            .statusCode(400);
     }
 
 
@@ -186,10 +297,10 @@ public class ReservationControllerTestsIT {
      */
     @Test
     public void testCheckInReservation_InvalidCode() throws Exception {
-        when(reservationService.checkInReservation("invalidCode")).thenThrow(new NoSuchElementException());
-
-        mvc.perform(put("/api/v1/reservations/invalidCode"))
-            .andExpect(status().isNotFound());
+        when()
+            .put("/api/v1/reservations/invalidCode")
+        .then()
+            .statusCode(404);
     }
 
     /**
@@ -199,13 +310,11 @@ public class ReservationControllerTestsIT {
      */
     @Test
     public void testCheckInReservation_ValidCode() throws Exception {
-        Reservation reservation = new Reservation();
-        reservation.setStatus(ReservationStatus.USED);
-        when(reservationService.checkInReservation("validCode")).thenReturn(reservation);
-
-        mvc.perform(put("/api/v1/reservations/validCode"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status").value("used"));
+        when()
+            .put("/api/v1/reservations/" + validReservation.getCode())
+        .then()
+            .statusCode(200)
+            .body("status", is("used"));
     }
 
     /**
@@ -215,10 +324,13 @@ public class ReservationControllerTestsIT {
      */
     @Test
     public void testCheckInReservation_UsedStatus() throws Exception {
-        when(reservationService.checkInReservation("usedCode")).thenThrow(new IllegalStateException());
+        validReservation.setStatus(ReservationStatus.USED);
+        reservationRepository.save(validReservation);
 
-        mvc.perform(put("/api/v1/reservations/usedCode"))
-            .andExpect(status().isBadRequest());
+        when()
+            .put("/api/v1/reservations/" + validReservation.getCode())
+        .then()
+            .statusCode(400);
     }
 
     /**
@@ -228,9 +340,12 @@ public class ReservationControllerTestsIT {
      */
     @Test
     public void testCheckInReservation_CancelledStatus() throws Exception {
-        when(reservationService.checkInReservation("cancelledCode")).thenThrow(new IllegalStateException());
+        validReservation.setStatus(ReservationStatus.CANCELLED);
+        reservationRepository.save(validReservation);
 
-        mvc.perform(put("/api/v1/reservations/cancelledCode"))
-            .andExpect(status().isBadRequest());
+        when()
+            .put("/api/v1/reservations/" + validReservation.getCode())
+        .then()
+            .statusCode(400);
     }
 }

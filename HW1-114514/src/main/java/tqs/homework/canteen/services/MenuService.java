@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import tqs.homework.canteen.DTOs.MealDTO;
 import tqs.homework.canteen.DTOs.MenuRequestDTO;
 import tqs.homework.canteen.entities.Meal;
@@ -16,6 +16,7 @@ import tqs.homework.canteen.repositories.MenuRepository;
 import tqs.homework.canteen.repositories.RestaurantRepository;
 
 @Service
+@Transactional
 public class MenuService implements IMenuService {
     @Autowired
     private RestaurantRepository restaurantRepository;
@@ -42,10 +43,10 @@ public class MenuService implements IMenuService {
 
     @Override
     public Menu addMeals(Long menuId, List<MealDTO> meals) {
-        Menu menu = menuRepository.findById(menuId)
-            .orElseThrow(() -> new NoSuchElementException("Menu with id \"" + menuId + "\" not found!"));
+        if (!menuRepository.existsById(menuId)) {
+            throw new NoSuchElementException("Menu with id \"" + menuId + "\" not found!");
+        }
 
-        List<Meal> options = menu.getOptions();
         for (MealDTO meal : meals) {
             try {
                 addMeal(meal);

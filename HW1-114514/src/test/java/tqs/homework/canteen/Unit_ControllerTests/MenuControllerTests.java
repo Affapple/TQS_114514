@@ -1,6 +1,5 @@
 package tqs.homework.canteen.Unit_ControllerTests;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -13,16 +12,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import tqs.homework.canteen.DTOs.MealDTO;
@@ -72,6 +66,9 @@ public class MenuControllerTests {
         when(menuService.createNewMenu(Mockito.any(MenuRequestDTO.class)))
             .thenReturn(new Menu());
 
+        when(menuService.addMeals(Mockito.anyLong(), Mockito.anyList()))
+            .thenReturn(new Menu());
+
         mvc.perform(
             post("/api/v1/menu")
             .contentType(MediaType.APPLICATION_JSON)
@@ -94,6 +91,9 @@ public class MenuControllerTests {
         when(menuService.createNewMenu(Mockito.any(MenuRequestDTO.class)))
             .thenThrow(new IllegalStateException("Menu already exists!"));
 
+        when(menuService.addMeals(Mockito.anyLong(), Mockito.anyList()))
+            .thenReturn(new Menu());
+
         mvc.perform(
             post("/api/v1/menu")
             .contentType(MediaType.APPLICATION_JSON)
@@ -114,6 +114,9 @@ public class MenuControllerTests {
     public void whenAddMealToMenu_thenReturn404() throws Exception {
         when(menuService.addMeal(Mockito.any(MealDTO.class)))
             .thenThrow(new NoSuchElementException("Menu not found!"));
+
+        when(menuService.addMeals(Mockito.anyLong(), Mockito.anyList()))
+            .thenReturn(new Menu());
 
         mvc.perform(
             put("/api/v1/menu/1")

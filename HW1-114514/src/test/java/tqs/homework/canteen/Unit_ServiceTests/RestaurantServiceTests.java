@@ -32,9 +32,6 @@ class RestaurantServiceTests {
     @InjectMocks
     private RestaurantService restaurantService;
 
-    private Restaurant testRestaurant;
-    private Restaurant anotherRestaurant;
-
     /*
      * Given a new restaurant
      * when save new restaurant

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import tqs.homework.canteen.DTOs.MenuDTO;
 import tqs.homework.canteen.entities.Menu;
 import tqs.homework.canteen.entities.Restaurant;
 import tqs.homework.canteen.services.MenuService;
