@@ -1,4 +1,4 @@
-package tqs.homework.canteen.repositoryTests;
+package tqs.homework.canteen.Unit_RepositoryTests;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.iterableWithSize;

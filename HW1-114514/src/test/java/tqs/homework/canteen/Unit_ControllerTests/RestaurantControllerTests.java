@@ -1,4 +1,4 @@
-package tqs.homework.canteen.controllerTests;
+package tqs.homework.canteen.Unit_ControllerTests;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

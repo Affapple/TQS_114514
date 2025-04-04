@@ -19,6 +19,19 @@ import tqs.homework.canteen.DTOs.MenuRequestDTO;
 public class MenuController {
     @PostMapping
     public ResponseEntity<MenuDTO> createNewMenu(MenuRequestDTO menuRequest) {
+        /*
+         *     private Long restaurantId;
+         *     private List<MealDTO> options;
+         *     private LocalDate date;
+         *     private MenuTime time;
+         */
+        /**
+         * Given restaurant "Castro" exists 
+         *  and has 2 menus for the dates 2025-04-01 and 2025-04-02
+         * when createNewMenu is called with id 1, 2025-04-03 and MenuTime.LUNCH
+         * then a new menu is created
+         * 
+         */
         return new ResponseEntity<>(null, HttpStatus.NOT_IMPLEMENTED);
     }
 

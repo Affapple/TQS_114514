@@ -19,6 +19,15 @@ import tqs.homework.canteen.entities.Restaurant;
 public class RestaurantController {
     @GetMapping
     public ResponseEntity<List<Restaurant>> getAllRestaurants() {
+        /*
+         * Given restaurant "Castro", "Grelhados", "Santiago" exist
+         * when getAllRestaurants is called
+         * then a list of <Castro, Grelhados, Santiago> is returned
+         * 
+         * Given no restaurants exist
+         * when getAllRestaurants is called
+         * then an empty list is returned
+         */
         return new ResponseEntity<>(null, HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -26,6 +35,15 @@ public class RestaurantController {
     public ResponseEntity<Restaurant> getRestaurant(
         @PathVariable Long restaurantId
     ) {
+        /*
+         * Given restaurant "Castro" exists
+         * when getRestaurant is called with id 1
+         * then the restaurant "Castro" is returned
+         * 
+         * Given restaurants exists
+         * when getRestaurant is called with an invalid id
+         * then a body with status 404 is returned
+         */
         return new ResponseEntity<>(null, HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -35,6 +53,42 @@ public class RestaurantController {
         @RequestBody LocalDate from,
         @RequestBody LocalDate to
     ) {
+        /*
+         * Given restaurant "Castro" exists 
+         *  and has 2 menus for the dates 2025-04-01 and 2025-04-02
+         * when getMenusOfRestaurant is called with id 1, 2025-04-01 and 2025-04-02
+         * then a list of <Menu1, Menu2> is returned
+         * 
+         * Given restaurant "Castro" exists 
+         *  and has no menus for the dates 2025-04-01 and 2025-04-02
+         * when getMenusOfRestaurant is called with id 1, 2025-04-01 and 2025-04-02
+         * then an empty list is returned
+         * 
+         * Given restaurant "Castro" exists 
+         *  and has 2 menus for the dates 2025-04-01 and 2025-04-02
+         * when getMenusOfRestaurant is called with id 1, 2025-03-30 and 2025-04-01
+         * then a list of <Menu1> is returned
+         * 
+         * Given restaurant "Castro" exists 
+         *  and has 2 menus for the dates 2025-04-01 and 2025-04-02
+         * when getMenusOfRestaurant is called with id 1, 2025-04-03 and 2025-04-04
+         * then a list of <Menu2> is returned
+         * 
+         * Given restaurant "Castro" exists 
+         *  and has 2 menus for the dates 2025-04-01 and 2025-04-02
+         * when getMenusOfRestaurant is called with id 1, 2025-04-02 and null
+         * then a list of <Menu2> is returned
+         * 
+         * Given restaurant "Castro" exists 
+         *  and has 2 menus for the dates 2025-04-01 and 2025-04-02
+         * when getMenusOfRestaurant is called with id 1, null and 2025-04-01
+         * then a list of <Menu1> is returned
+         * 
+         * Given restaurant "Castro" exists 
+         *  and has 2 menus for the dates 2025-04-01 and 2025-04-02
+         * when getMenusOfRestaurant is called with id 1, null and null
+         * then a list of <Menu1, Menu2> is returned
+         */
         return new ResponseEntity<>(null, HttpStatus.NOT_IMPLEMENTED);
     }
 }

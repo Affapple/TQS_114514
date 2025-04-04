@@ -7,5 +7,4 @@ public interface IRestaurantService {
     public Restaurant saveNewRestaurant(Restaurant newRestaurant);
     public List<Restaurant> getAllRestaurants();
     public Restaurant getRestaurantById(Long id);
-    
 }

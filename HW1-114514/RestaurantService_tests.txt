@@ -1,0 +1,17 @@
+    /** 
+     * Given a new restaurant
+     * when save new restaurant
+     * then the restaurant is saved
+     *
+     * Given all restaurants
+     * when get all restaurants
+     * then the list of restaurants is returned
+     *
+     * Given a valid restaurant id
+     * when get restaurant by id
+     * then the restaurant is returned
+     *
+     * Given an invalid restaurant id
+     * when get restaurant by id
+     * then an NoSuchElementException is thrown
+     */

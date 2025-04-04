@@ -1,4 +1,4 @@
-package tqs.homework.canteen.serviceTests;
+package tqs.homework.canteen.Unit_ServiceTests;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;

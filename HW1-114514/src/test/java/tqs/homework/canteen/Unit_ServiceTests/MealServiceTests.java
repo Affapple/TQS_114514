@@ -1,4 +1,4 @@
-package tqs.homework.canteen.serviceTests;
+package tqs.homework.canteen.Unit_ServiceTests;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
