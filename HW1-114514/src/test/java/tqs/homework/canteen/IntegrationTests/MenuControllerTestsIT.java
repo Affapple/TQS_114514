@@ -1,4 +1,4 @@
-package tqs.homework.canteen.Unit_ControllerTests;
+package tqs.homework.canteen.IntegrationTests;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -17,10 +17,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -34,11 +32,11 @@ import tqs.homework.canteen.entities.Menu;
 import tqs.homework.canteen.services.MenuService;
 
 @WebMvcTest(MenuController.class)
-public class MenuControllerTests {
+public class MenuControllerTestsIT {
     @Autowired
     public MockMvc mvc;
     
-    @MockitoBean
+    @Autowired
     public MenuService menuService;
 
     /* POST: /api/v1/menu */
@@ -50,8 +48,6 @@ public class MenuControllerTests {
 
     @Test
     public void whenCreateNewMenuToRestaurant_thenReturn404() throws Exception {
-        when(menuService.createNewMenu(Mockito.any(MenuRequestDTO.class)))
-            .thenThrow(new NoSuchElementException("Restaurant not found!"));
 
         mvc.perform(
             post("/api/v1/menu")

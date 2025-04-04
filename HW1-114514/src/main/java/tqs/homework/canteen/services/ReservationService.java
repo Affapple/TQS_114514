@@ -1,11 +1,14 @@
 package tqs.homework.canteen.services;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import tqs.homework.canteen.DTOs.ReservationRequestDTO;
+import tqs.homework.canteen.EnumTypes.MenuTime;
 import tqs.homework.canteen.EnumTypes.ReservationStatus;
 import tqs.homework.canteen.entities.Meal;
 import tqs.homework.canteen.entities.Menu;
@@ -13,11 +16,14 @@ import tqs.homework.canteen.entities.Reservation;
 import tqs.homework.canteen.repositories.MealRepository;
 import tqs.homework.canteen.repositories.MenuRepository;
 import tqs.homework.canteen.repositories.ReservationRepository;
+import tqs.homework.canteen.repositories.RestaurantRepository;
 
 @Service
 public class ReservationService implements IReservationService {
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
+    private RestaurantRepository restaurantRepository;
     @Autowired
     private MealRepository mealRepository;
     @Autowired
@@ -98,5 +104,22 @@ public class ReservationService implements IReservationService {
         //log.info("Checked in reservation with code: {}", code);
 
         return updatedReservation;
+    }
+
+    @Override
+    public List<Reservation> getAllReservations(Long restaurantId, LocalDate date, MenuTime time) {
+        if (!restaurantRepository.existsById(restaurantId)) {
+            throw new NoSuchElementException("Restaurant with id \"" + restaurantId + "\" not found!");
+        }
+        
+        if(date == null) {
+            return reservationRepository.findAllByRestaurant_id(restaurantId);
+        }
+
+        if(time == null) {
+            return reservationRepository.findAllByRestaurant_idAndDate(restaurantId, date);
+        }
+
+        return reservationRepository.findAllByRestaurant_idAndDateAndTime(restaurantId, date, time);
     }
 }

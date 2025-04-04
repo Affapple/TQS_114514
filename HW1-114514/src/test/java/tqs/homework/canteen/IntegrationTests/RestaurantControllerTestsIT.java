@@ -1,6 +1,5 @@
-package tqs.homework.canteen.Unit_ControllerTests;
+package tqs.homework.canteen.IntegrationTests;
 
-import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -11,11 +10,9 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -28,14 +25,14 @@ import tqs.homework.canteen.services.MenuService;
 import tqs.homework.canteen.services.RestaurantService;
 
 @WebMvcTest(RestaurantController.class)
-public class RestaurantControllerTests {
+public class RestaurantControllerTestsIT {
     @Autowired
     private MockMvc mvc;
 
-    @MockitoBean
+    @Autowired
     private MenuService menuService;
 
-    @MockitoBean
+    @Autowired
     private RestaurantService restaurantService;
 
     /* GET: /api/v1/restaurant */
@@ -46,13 +43,6 @@ public class RestaurantControllerTests {
      */
     @Test
     public void whenGetAllRestaurants_thenListOfRestaurantsIsReturned() throws Exception {
-        when(restaurantService.getAllRestaurants()).thenReturn(
-            List.of(
-                new Restaurant("Castro", "Castro", 10),
-                new Restaurant("Grelhados", "Grelhados", 10),
-                new Restaurant("Santiago", "Santiago", 10)
-            )
-        );
 
         mvc.perform(get("/api/v1/restaurant"))
             .andExpect(status().isOk())

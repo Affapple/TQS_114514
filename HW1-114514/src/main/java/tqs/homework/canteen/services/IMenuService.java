@@ -15,4 +15,6 @@ public interface IMenuService {
     public List<Meal> getMeals(Long menuId);
     public List<Menu> getMenusByRestaurantId(Long restaurantId);
     public List<Menu> getMenusOfRestaurantBetweenDates(Long restaurantId, LocalDate from, LocalDate to);
+    public void deleteMenu(Long menuId);
+    public void deleteMeal(Long menuId, Long mealId);
 }

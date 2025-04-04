@@ -100,4 +100,20 @@ public class MenuService implements IMenuService {
 
         return menuRepository.findByRestaurant_idAndDateBetween(restaurantId, from, to);
     }
+
+    @Override
+    public void deleteMenu(Long menuId) {
+        if (!menuRepository.existsById(menuId)) {
+            throw new NoSuchElementException("Menu with id \"" + menuId + "\" not found!");
+        }
+
+        menuRepository.deleteById(menuId);
+    }
+
+    @Override
+    public void deleteMeal(Long menuId, Long mealId) {
+        if (!menuRepository.existsById(menuId)) {
+            throw new NoSuchElementException("Menu with id \"" + menuId + "\" not found!");
+        }
+    }
 }

@@ -1,5 +1,6 @@
 /restaurant
     GET -> return all restaurants
+    POST -> Create new Restaurant
     /{restaurant_id}
         GET -> get restaurant info
         /menus
@@ -15,3 +16,11 @@
         DELETE -> Delete Menu
         /{meal_id}
             DELETE -> Remove meal from menu
+
+/reservations
+    GET -> get all reservation (Param: restaurant_id and date and time)
+    POST -> Create a reservation for a meal (Param: meal_id)
+    /{reservation_id}
+        GET -> Get info of a reservation
+        DELETE -> Cancel a reservation
+        PUT -> Checkin reservation

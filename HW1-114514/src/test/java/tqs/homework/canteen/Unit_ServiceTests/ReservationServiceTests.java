@@ -31,6 +31,7 @@ import tqs.homework.canteen.entities.Restaurant;
 import tqs.homework.canteen.repositories.MealRepository;
 import tqs.homework.canteen.repositories.MenuRepository;
 import tqs.homework.canteen.repositories.ReservationRepository;
+import tqs.homework.canteen.repositories.RestaurantRepository;
 import tqs.homework.canteen.services.ReservationService;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,8 +47,12 @@ public class ReservationServiceTests {
     @Mock
     private MenuRepository menuRepository;
 
+    @Mock
+    private RestaurantRepository restaurantRepository;
+
     @InjectMocks
     private ReservationService reservationService;
+
 
     /* METHOD: createReservation */
     /**
@@ -318,4 +323,89 @@ public class ReservationServiceTests {
             reservationService.checkInReservation("12345678");
         });
     }
+
+
+    /* METHOD: getAllReservations */
+    /*
+     * Given restaurant doesnt exist
+     * when getAllReservations is called
+     * then no such element exception is thrown
+     */
+    @Test
+    public void whenGetAllReservationsWithInvalidRestaurantId_thenExceptionShouldBeThrown() {
+        when(restaurantRepository.existsById(1L)).thenReturn(false);
+
+        assertThrows(NoSuchElementException.class, () -> {
+            reservationService.getAllReservations(1L, LocalDate.now(), MenuTime.LUNCH);
+        });
+    }
+    /**
+     * Given restaurant exists
+     * when getAllReservations is called with date and time
+     * then a list of reservations of the restaurant at the given date and time is returned
+     */
+    @Test
+    public void whenGetAllReservationsWithValidRestaurantIdAndDateAndTime_thenReservationsShouldBeReturned() {
+        when(restaurantRepository.existsById(1L)).thenReturn(true);
+        when(reservationRepository
+         .findAllByRestaurant_idAndDateAndTime(1L, LocalDate.now(), MenuTime.LUNCH))
+         .thenReturn(List.of(new Reservation()));
+
+
+        List<Reservation> reservations = reservationService.getAllReservations(
+            1L, 
+            LocalDate.now(), 
+            MenuTime.LUNCH
+        );
+
+        assertThat(reservations, is(notNullValue()));
+        assertThat(reservations.size(), is(1));
+    }
+    /**
+     * Given restaurant exists
+     * when getAllReservations is called with date and null
+     * then a list of reservations of the restaurant at the given date is returned
+     */
+    @Test
+    public void whenGetAllReservationsWithValidRestaurantIdAndDateAndNullTime_thenReservationsShouldBeReturned() {
+        when(restaurantRepository.existsById(1L)).thenReturn(true);
+        when(reservationRepository
+         .findAllByRestaurant_idAndDate(1L, LocalDate.now()))
+         .thenReturn(List.of(new Reservation()));
+
+        List<Reservation> reservations = reservationService.getAllReservations(
+            1L, 
+            LocalDate.now(), 
+            null
+        );
+
+        assertThat(reservations, is(notNullValue()));
+        assertThat(reservations.size(), is(1));
+    }
+    /**
+     * Given restaurant exists
+     * when getAllReservations is called with null and time
+     * then a list of reservations of the restaurant at the given time is returned
+     */
+    @Test
+    public void whenGetAllReservationsWithValidRestaurantIdAndNullDateAndTime_thenReservationsShouldBeReturned() {
+        when(restaurantRepository.existsById(1L)).thenReturn(true);
+        when(reservationRepository
+         .findAllByRestaurant_id(1L))
+         .thenReturn(List.of(new Reservation()));
+
+        List<Reservation> reservations = reservationService.getAllReservations(
+            1L, 
+            null, 
+            null
+        );
+
+        assertThat(reservations, is(notNullValue()));
+        assertThat(reservations.size(), is(1));
+    }
+    /**
+     * Given restaurant exists
+     * when getAllReservations is called with null and null
+     * then a list of reservations of the restaurant is returned
+     */
 }
