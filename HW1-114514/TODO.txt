@@ -1,0 +1,26 @@
+- Weather Service and API
+- Cache System for Weather service
+- Frontend
+- Frontend Testing
+- Performance/Load test
+- Jacoco report tests
+- SonarQube tests (static code analysis)
+
+
+- Report
+    - Diagrams
+
+
+
+Ordem de trabalho: 
+    Começar Frontend
+    Integrar API ja feita
+
+    Weather Service
+    Testes Weather service
+    Cache weather service
+
+    Jacoco tests
+    Frontend tests
+
+    Performance/Load tests
