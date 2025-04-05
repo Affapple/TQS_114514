@@ -7,4 +7,5 @@ import tqs.homework.canteen.entities.Meal;
 
 @Repository
 public interface MealRepository extends JpaRepository<Meal, Long> {
+    boolean existsByMenu_idAndId(Long menuId, Long mealId);
 }

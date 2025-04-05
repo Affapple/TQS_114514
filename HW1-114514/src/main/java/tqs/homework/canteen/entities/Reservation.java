@@ -3,32 +3,33 @@ package tqs.homework.canteen.entities;
 
 import java.util.UUID;
 
-import jakarta.annotation.PostConstruct;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import tqs.homework.canteen.DTOs.ReservationDTO;
 import tqs.homework.canteen.EnumTypes.ReservationStatus;
 
 
 @Entity
-@Data
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString(exclude = {"meal"})
 public class Reservation {
     @Id
     private String code;
     private ReservationStatus status;
     
     @ManyToOne
+    @JsonIgnore
     private Meal meal;
 
-    @PostConstruct
     public String generateCode() {
         code = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         return code;

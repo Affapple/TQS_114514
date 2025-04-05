@@ -3,16 +3,18 @@ package tqs.homework.canteen.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
 import tqs.homework.canteen.EnumTypes.MealType;
 
 @Entity
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
+@ToString(exclude = {"menu"})
 public class Meal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,9 +25,10 @@ public class Meal {
     private MealType type;
 
     @ManyToOne
+    @JsonIgnore
     private Menu menu;
     
-    @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Reservation> reservations = new ArrayList<>();
 
     public Meal(String description, MealType type, Menu menu) {

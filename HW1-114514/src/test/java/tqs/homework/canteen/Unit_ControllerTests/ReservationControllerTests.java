@@ -105,12 +105,12 @@ public class ReservationControllerTests {
     /**
      * Given a valid mealId and no free capacity,
      * when the meal is reserved
-     * then an IllegalStateException is thrown.
+     * then an IllegalArgumentException is thrown.
      */
     @Test
     public void testCreateReservation_NoFreeCapacity() throws Exception {
         when(reservationService.createReservation(Mockito.any(ReservationRequestDTO.class)))
-        .thenThrow(new IllegalStateException());
+        .thenThrow(new IllegalArgumentException());
 
         mvc.perform(
             post("/api/v1/reservations")
@@ -152,11 +152,11 @@ public class ReservationControllerTests {
     /**
      * Given a valid code and a reservation with status USED
      * when cancel reservation
-     * then an IllegalStateException is thrown
+     * then an IllegalArgumentException is thrown
      */
     @Test
     public void testCancelReservation_UsedStatus() throws Exception {
-        when(reservationService.cancelReservation("usedCode")).thenThrow(new IllegalStateException());
+        when(reservationService.cancelReservation("usedCode")).thenThrow(new IllegalArgumentException());
 
         mvc.perform(delete("/api/v1/reservations/usedCode"))
             .andExpect(status().isBadRequest());
@@ -165,11 +165,11 @@ public class ReservationControllerTests {
     /**
      * Given a valid code and a reservation with status CANCELLED   
      * when cancel reservation
-     * then an IllegalStateException is thrown
+     * then an IllegalArgumentException is thrown
      */
     @Test
     public void testCancelReservation_CancelledStatus() throws Exception {
-        when(reservationService.cancelReservation("cancelledCode")).thenThrow(new IllegalStateException());
+        when(reservationService.cancelReservation("cancelledCode")).thenThrow(new IllegalArgumentException());
 
         mvc.perform(delete("/api/v1/reservations/cancelledCode"))
             .andExpect(status().isBadRequest());
@@ -209,11 +209,11 @@ public class ReservationControllerTests {
     /**
      * Given a valid code and a reservation with status USED
      * when check in reservation
-     * then an IllegalStateException is thrown
+     * then an IllegalArgumentException is thrown
      */
     @Test
     public void testCheckInReservation_UsedStatus() throws Exception {
-        when(reservationService.checkInReservation("usedCode")).thenThrow(new IllegalStateException());
+        when(reservationService.checkInReservation("usedCode")).thenThrow(new IllegalArgumentException());
 
         mvc.perform(put("/api/v1/reservations/usedCode"))
             .andExpect(status().isBadRequest());
@@ -222,11 +222,11 @@ public class ReservationControllerTests {
     /**
      * Given a valid code and a reservation with status CANCELLED
      * when check in reservation
-     * then an IllegalStateException is thrown
+     * then an IllegalArgumentException is thrown
      */
     @Test
     public void testCheckInReservation_CancelledStatus() throws Exception {
-        when(reservationService.checkInReservation("cancelledCode")).thenThrow(new IllegalStateException());
+        when(reservationService.checkInReservation("cancelledCode")).thenThrow(new IllegalArgumentException());
 
         mvc.perform(put("/api/v1/reservations/cancelledCode"))
             .andExpect(status().isBadRequest());

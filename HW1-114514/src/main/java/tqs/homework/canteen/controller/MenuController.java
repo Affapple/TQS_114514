@@ -24,19 +24,19 @@ public class MenuController {
     private MenuService menuService;
 
     @PostMapping
-    public ResponseEntity<Menu> createNewMenu(MenuRequestDTO menuRequest) {
+    public ResponseEntity<Menu> createNewMenu(
+        @RequestBody MenuRequestDTO menuRequest
+    ) {
         Menu menu = menuService.createNewMenu(menuRequest);
-        Menu finalMenu = menuService.addMeals(menu.getId(), menuRequest.getOptions());
         
         return new ResponseEntity<>(
-            finalMenu,
+            menu,
             HttpStatus.CREATED
         );
     }
 
-    @PutMapping("/{menuId}")
+    @PutMapping
     public ResponseEntity<Menu> addMealToMenu(
-        @PathVariable Long menuId,
         @RequestBody MealDTO meal
     ) {
         return new ResponseEntity<>(

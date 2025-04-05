@@ -11,8 +11,8 @@
                     all menus 
 /menu
     POST -> Create new Menu (Body MenuRequestDTO)
+    PUT -> Add meal to existing menu Body(MealDTO)
     /{menu_id}
-        PUT -> Add meal to existing menu Body(MealDTO)
         DELETE -> Delete Menu
         /{meal_id}
             DELETE -> Remove meal from menu

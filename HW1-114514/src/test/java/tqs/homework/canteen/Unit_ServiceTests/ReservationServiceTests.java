@@ -114,7 +114,7 @@ public class ReservationServiceTests {
     /**
      * Given a valid mealId and no free capacity,
      * when the meal is reserved
-     * then an IllegalStateException is thrown.
+     * then an IllegalArgumentException is thrown.
      */
     @Test
     public void whenCreateReservationWithValidMealIdAndNoFreeCapacity_thenExceptionShouldBeThrown() {
@@ -138,7 +138,7 @@ public class ReservationServiceTests {
         .thenReturn(reservation);
         when(mealRepository.findById(1L)).thenReturn(Optional.of(meal));
 
-        assertThrows(IllegalStateException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             reservationService.createReservation(
                 new ReservationRequestDTO(1L)
             );
@@ -224,7 +224,7 @@ public class ReservationServiceTests {
     /**
      * Given a valid code and a reservation with status USED
      * when cancel reservation
-     * then an IllegalStateException is thrown
+     * then an IllegalArgumentException is thrown
      */
     @Test
     public void whenCancelReservationWithValidCodeAndUsedReservation_thenExceptionShouldBeThrown() {
@@ -234,14 +234,14 @@ public class ReservationServiceTests {
 
         when(reservationRepository.findById("12345678")).thenReturn(Optional.of(reservation));
 
-        assertThrows(IllegalStateException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             reservationService.cancelReservation("12345678");
         });
     }
     /**
      * Given a valid code and a reservation with status CANCELLED   
      * when cancel reservation
-     * then an IllegalStateException is thrown
+     * then an IllegalArgumentException is thrown
      */
     @Test
     public void whenCancelReservationWithValidCodeAndCancelledReservation_thenExceptionShouldBeThrown() {
@@ -251,7 +251,7 @@ public class ReservationServiceTests {
 
         when(reservationRepository.findById("12345678")).thenReturn(Optional.of(reservation));
 
-        assertThrows(IllegalStateException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             reservationService.cancelReservation("12345678");
         });
     }
@@ -292,7 +292,7 @@ public class ReservationServiceTests {
     /**
      * Given a valid code and a reservation with status USED
      * when check in reservation
-     * then an IllegalStateException is thrown
+     * then an IllegalArgumentException is thrown
      */
     @Test
     public void whenCheckInReservationWithValidCodeAndUsedReservation_thenExceptionShouldBeThrown() {
@@ -302,14 +302,14 @@ public class ReservationServiceTests {
 
         when(reservationRepository.findById("12345678")).thenReturn(Optional.of(reservation));
 
-        assertThrows(IllegalStateException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             reservationService.checkInReservation("12345678");
         });
     }
     /**
      * Given a valid code and a reservation with status CANCELLED
      * when check in reservation
-     * then an IllegalStateException is thrown
+     * then an IllegalArgumentException is thrown
      */
     @Test
     void whenCheckInReservationWithValidCodeAndCancelledReservation_thenExceptionShouldBeThrown() {
@@ -319,7 +319,7 @@ public class ReservationServiceTests {
 
         when(reservationRepository.findById("12345678")).thenReturn(Optional.of(reservation));
 
-        assertThrows(IllegalStateException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             reservationService.checkInReservation("12345678");
         });
     }

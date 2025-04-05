@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum MealType {
     SOUP("soup"),
     MEAT("meat"),
-    FISH("FISH");
+    FISH("fish");
 
     private String name;
     MealType(String name) {

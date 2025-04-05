@@ -6,7 +6,6 @@ import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import tqs.homework.canteen.DTOs.ReservationRequestDTO;
 import tqs.homework.canteen.EnumTypes.MenuTime;
 import tqs.homework.canteen.EnumTypes.ReservationStatus;
@@ -19,7 +18,6 @@ import tqs.homework.canteen.repositories.ReservationRepository;
 import tqs.homework.canteen.repositories.RestaurantRepository;
 
 @Service
-@Transactional
 public class ReservationService implements IReservationService {
     @Autowired
     private ReservationRepository reservationRepository;
@@ -40,7 +38,7 @@ public class ReservationService implements IReservationService {
     
         Menu menu = meal.getMenu();
         if (menu.getCapacity() <= 0) {
-            throw new IllegalStateException("Cannot create reservation. Restaurant is full!");
+            throw new IllegalArgumentException("Cannot create reservation. Restaurant is full!");
         }
 
         menu.setCapacity(menu.getCapacity() - 1);
@@ -75,7 +73,7 @@ public class ReservationService implements IReservationService {
             );
 
         if (reservation.getStatus() != ReservationStatus.ACTIVE) {
-            throw new IllegalStateException("Reservation with code \""+code+"\" cannot be cancelled! Only active reservations can be cancelled.");
+            throw new IllegalArgumentException("Reservation with code \""+code+"\" cannot be cancelled! Only active reservations can be cancelled.");
         }
 
         Menu menu = reservation.getMeal().getMenu();
@@ -97,7 +95,7 @@ public class ReservationService implements IReservationService {
             );
 
         if (reservation.getStatus() != ReservationStatus.ACTIVE) {
-            throw new IllegalStateException("Cannot check-in. Reservation is " + reservation.getStatus().getName());
+            throw new IllegalArgumentException("Cannot check-in. Reservation is " + reservation.getStatus().getName());
         }
 
         reservation.setStatus(ReservationStatus.USED);

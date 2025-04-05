@@ -28,6 +28,7 @@ import tqs.homework.canteen.EnumTypes.MenuTime;
 import tqs.homework.canteen.entities.Meal;
 import tqs.homework.canteen.entities.Menu;
 import tqs.homework.canteen.entities.Restaurant;
+import tqs.homework.canteen.repositories.MealRepository;
 import tqs.homework.canteen.repositories.MenuRepository;
 import tqs.homework.canteen.repositories.RestaurantRepository;
 import tqs.homework.canteen.services.MenuService;
@@ -41,6 +42,9 @@ class MenuServiceTests {
 
     @Mock
     private RestaurantRepository restaurantRepository;
+
+    @Mock
+    private MealRepository mealRepository;
 
     @InjectMocks
     private MenuService menuService;
@@ -88,6 +92,8 @@ class MenuServiceTests {
         );
 
         when(menuRepository.findById(existentMenuID)).thenReturn(Optional.of(existentMenu));
+        when(menuRepository.save(Mockito.any(Menu.class))).thenReturn(existentMenu);
+        when(mealRepository.save(Mockito.any(Meal.class))).thenReturn(new Meal("New tasty meal", MealType.MEAT, existentMenu));
 
         MealDTO mealDTO = new MealDTO(existentMenuID, "New tasty meal", MealType.MEAT);
         menuService.addMeal(mealDTO);
@@ -122,6 +128,8 @@ class MenuServiceTests {
 
         when(menuRepository.findById(existentMenuID)).thenReturn(Optional.of(existentMenu));
         when(menuRepository.save(Mockito.any(Menu.class))).thenReturn(existentMenu);
+        when(mealRepository.save(Mockito.any(Meal.class))).thenReturn(new Meal("New tasty meal", MealType.MEAT, existentMenu));
+
 
         MealDTO mealDTO = new MealDTO(existentMenuID, "New tasty meal", MealType.MEAT);
 
@@ -168,8 +176,14 @@ class MenuServiceTests {
         Restaurant restaurant = new Restaurant(10l, "Test Restaurant", "Test Location", 10, new ArrayList<>());
         when(restaurantRepository.findById(anyLong())).thenReturn(Optional.of(restaurant));
         when(restaurantRepository.save(Mockito.any(Restaurant.class))).thenReturn(restaurant);
-        when(menuRepository.save(Mockito.any(Menu.class))).thenReturn(new Menu(LocalDate.now(), MenuTime.LUNCH, restaurant));
-        
+
+        Menu existentMenu = new Menu(LocalDate.now(), MenuTime.LUNCH, restaurant);
+        existentMenu.setId(1L);
+        when(menuRepository.save(Mockito.any(Menu.class))).thenReturn(existentMenu);
+        when(mealRepository.save(Mockito.any(Meal.class))).thenReturn(new Meal("New tasty meal", MealType.MEAT, existentMenu));
+        when(menuRepository.findById(existentMenu.getId())).thenReturn(Optional.of(existentMenu));
+        when(menuRepository.existsById(existentMenu.getId())).thenReturn(true);
+
         MenuRequestDTO menuRequest = new MenuRequestDTO(
             10l,
             new ArrayList<>(),
@@ -273,11 +287,22 @@ class MenuServiceTests {
             new ArrayList<>()
         );
         when(menuRepository.save(Mockito.any(Menu.class)))
-        .thenReturn(menu);
+            .thenReturn(menu);
         when(menuRepository.findById(1l))
-        .thenReturn(Optional.of(menu));
+            .thenReturn(Optional.of(menu));
+        when(menuRepository.existsById(1L)).thenReturn(true);
+        when(mealRepository.save(Mockito.any(Meal.class)))
+            .thenAnswer( invocation -> {
+                    Meal meal = invocation.getArgument(0);
+                    meal.setMenu(menu);
+                    return meal;
+                }
+            );
 
-        menuService.addMeal(new MealDTO(1L, "Meal 1", MealType.MEAT));
+        Menu newMenu = menuService.addMeal(new MealDTO(1L, "Meal 1", MealType.MEAT));
+
+        System.out.println("New menu:" + newMenu);
+        System.out.println("\n\nSECOND MEAL");
         menuService.addMeal(new MealDTO(1L, "Meal 2", MealType.FISH));
 
         when(menuRepository.findById(anyLong())).thenReturn(Optional.of(menu));

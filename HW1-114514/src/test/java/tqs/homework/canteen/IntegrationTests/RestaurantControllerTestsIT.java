@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -22,7 +21,6 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 
 import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
 import static org.hamcrest.Matchers.*;
 
 import tqs.homework.canteen.TestcontainersConfiguration;
@@ -55,7 +53,6 @@ public class RestaurantControllerTestsIT {
 
     Restaurant castro, grelhados, santiago;
     @BeforeEach
-    @Transactional
     public void setUp() {
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = randomServerPort;

@@ -6,7 +6,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,10 +15,8 @@ import org.springframework.context.annotation.Import;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import jakarta.transaction.Transactional;
 
 import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
 import static org.hamcrest.Matchers.*;
 
 import tqs.homework.canteen.TestcontainersConfiguration;
@@ -64,9 +61,9 @@ public class ReservationControllerTestsIT {
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = randomServerPort;
         
-        castro = restaurantService.saveNewRestaurant(new Restaurant("Castro", "Castro", 1));
-        grelhados = restaurantService.saveNewRestaurant(new Restaurant("Grelhados", "Grelhados", 1));
-        santiago = restaurantService.saveNewRestaurant(new Restaurant("Santiago", "Santiago", 1));
+        castro = restaurantService.saveNewRestaurant(new Restaurant("Castro", "Castro", 2));
+        grelhados = restaurantService.saveNewRestaurant(new Restaurant("Grelhados", "Grelhados", 2));
+        santiago = restaurantService.saveNewRestaurant(new Restaurant("Santiago", "Santiago", 2));
 
         /* CASTRO */
         menuService.createNewMenu(new MenuRequestDTO(
@@ -76,7 +73,7 @@ public class ReservationControllerTestsIT {
                 new MealDTO(null, "Meal 1 Meat Lunch", MealType.MEAT),
                 new MealDTO(null, "Meal 1 Fish Lunch", MealType.FISH)
             ),
-            LocalDate.of(2025, 4, 1),
+            LocalDate.now(),
             MenuTime.LUNCH
         ));
         menuService.createNewMenu(new MenuRequestDTO(
@@ -86,18 +83,18 @@ public class ReservationControllerTestsIT {
                 new MealDTO(null, "Meal 2 Meat Dinner", MealType.MEAT),
                 new MealDTO(null, "Meal 2 Fish Dinner", MealType.FISH)
             ),
-            LocalDate.of(2025, 4, 1),
+            LocalDate.now(),
             MenuTime.DINNER
         ));
 
-        menuService.createNewMenu(new MenuRequestDTO(
+        Menu updatedCastroMenu = menuService.createNewMenu(new MenuRequestDTO(
             castro.getId(), 
             List.of(
                 new MealDTO(null, "Meal 3 Soup Lunch", MealType.SOUP),
                 new MealDTO(null, "Meal 3 Meat Lunch", MealType.MEAT),
                 new MealDTO(null, "Meal 3 Fish Lunch", MealType.FISH)
             ),
-            LocalDate.of(2025, 4, 2),
+            LocalDate.now().plusDays(1),
             MenuTime.LUNCH
         ));
 
@@ -109,7 +106,7 @@ public class ReservationControllerTestsIT {
                 new MealDTO(null, "Meal 1 Meat Lunch", MealType.MEAT),
                 new MealDTO(null, "Meal 1 Fish Lunch", MealType.FISH)
             ),
-            LocalDate.of(2025, 4, 1),
+            LocalDate.now(),
             MenuTime.LUNCH
         ));
 
@@ -120,7 +117,7 @@ public class ReservationControllerTestsIT {
                 new MealDTO(null, "Meal 2 Meat Dinner", MealType.MEAT),
                 new MealDTO(null, "Meal 2 Fish Dinner", MealType.FISH)
             ),
-            LocalDate.of(2025, 4, 1),
+            LocalDate.now(),
             MenuTime.DINNER
         ));
         menuService.createNewMenu(new MenuRequestDTO(
@@ -130,14 +127,12 @@ public class ReservationControllerTestsIT {
                 new MealDTO(null, "Meal 3 Meat Dinner", MealType.MEAT),
                 new MealDTO(null, "Meal 3 Fish Dinner", MealType.FISH)
             ),
-            LocalDate.of(2025, 4, 1),
+            LocalDate.now().plusDays(1),
             MenuTime.DINNER
         ));
 
-        Menu menu = menuService.getMenusByRestaurantId(castro.getId()).getFirst();
-
         validReservation = reservationService.createReservation(
-            new ReservationRequestDTO(menu.getOptions().getFirst().getId())
+            new ReservationRequestDTO(updatedCastroMenu.getOptions().getFirst().getId())
         );
     }
     
@@ -148,7 +143,6 @@ public class ReservationControllerTestsIT {
      * then an NoSuchElementException is thrown
      */
     @Test
-    @Transactional
     public void testGetReservationByCode_InvalidCode() throws Exception {
         when()
             .get("/api/v1/reservations/invalidCode")
@@ -207,7 +201,7 @@ public class ReservationControllerTestsIT {
     /**
      * Given a valid mealId and no free capacity,
      * when the meal is reserved
-     * then an IllegalStateException is thrown.
+     * then an IllegalArgumentException is thrown.
      */
     @Test
     public void testCreateReservation_NoFreeCapacity() throws Exception {
@@ -259,7 +253,7 @@ public class ReservationControllerTestsIT {
     /**
      * Given a valid code and a reservation with status USED
      * when cancel reservation
-     * then an IllegalStateException is thrown
+     * then an IllegalArgumentException is thrown
      */
     @Test
     public void testCancelReservation_UsedStatus() throws Exception {
@@ -275,7 +269,7 @@ public class ReservationControllerTestsIT {
     /**
      * Given a valid code and a reservation with status CANCELLED   
      * when cancel reservation
-     * then an IllegalStateException is thrown
+     * then an IllegalArgumentException is thrown
      */
     @Test
     public void testCancelReservation_CancelledStatus() throws Exception {
@@ -320,7 +314,7 @@ public class ReservationControllerTestsIT {
     /**
      * Given a valid code and a reservation with status USED
      * when check in reservation
-     * then an IllegalStateException is thrown
+     * then an IllegalArgumentException is thrown
      */
     @Test
     public void testCheckInReservation_UsedStatus() throws Exception {
@@ -336,7 +330,7 @@ public class ReservationControllerTestsIT {
     /**
      * Given a valid code and a reservation with status CANCELLED
      * when check in reservation
-     * then an IllegalStateException is thrown
+     * then an IllegalArgumentException is thrown
      */
     @Test
     public void testCheckInReservation_CancelledStatus() throws Exception {

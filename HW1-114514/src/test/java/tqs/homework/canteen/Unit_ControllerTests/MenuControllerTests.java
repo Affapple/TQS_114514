@@ -89,7 +89,7 @@ public class MenuControllerTests {
     @Test
     public void whenCreateNewMenuToRestaurant_thenReturn400() throws Exception {
         when(menuService.createNewMenu(Mockito.any(MenuRequestDTO.class)))
-            .thenThrow(new IllegalStateException("Menu already exists!"));
+            .thenThrow(new IllegalArgumentException("Menu already exists!"));
 
         when(menuService.addMeals(Mockito.anyLong(), Mockito.anyList()))
             .thenReturn(new Menu());
@@ -119,13 +119,12 @@ public class MenuControllerTests {
             .thenReturn(new Menu());
 
         mvc.perform(
-            put("/api/v1/menu/1")
+            put("/api/v1/menu")
             .contentType(MediaType.APPLICATION_JSON)
             .content(
                 "{\"menuId\": 1}" + JsonUtils.toJson(new MealDTO(10L, "Meal", MealType.MEAT))
             )
-        )
-            .andExpect(status().isNotFound());
+        ).andExpect(status().isNotFound());
     }
 
     /**
@@ -137,10 +136,10 @@ public class MenuControllerTests {
     @Test
     public void whenAddMealToMenu_thenReturn400() throws Exception {
         when(menuService.addMeal(Mockito.any(MealDTO.class)))
-            .thenThrow(new IllegalStateException("Meal already exists!"));
+            .thenThrow(new IllegalArgumentException("Meal already exists!"));
 
         mvc.perform(
-            put("/api/v1/menu/1")
+            put("/api/v1/menu")
             .contentType(MediaType.APPLICATION_JSON)
             .content(
                 "{\"menuId\": 1}" + JsonUtils.toJson(new MealDTO(10L, "Meal", MealType.MEAT))
@@ -161,7 +160,7 @@ public class MenuControllerTests {
             .thenReturn(new Menu());
 
         mvc.perform(
-            put("/api/v1/menu/1")
+            put("/api/v1/menu")
             .contentType(MediaType.APPLICATION_JSON)
             .content(
                 "{\"menuId\": 1}" + JsonUtils.toJson(new MealDTO(10L, "Meal", MealType.MEAT))

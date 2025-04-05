@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Data
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,7 +19,7 @@ public class Restaurant {
     private String location;
     private Integer capacity;
     
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Menu> menus = new ArrayList<>();
 
     public Restaurant(String name, String location, Integer capacity) {

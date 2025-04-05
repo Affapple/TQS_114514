@@ -128,8 +128,8 @@ class RepositoryTests {
         meat.setType(MealType.MEAT);
         meat.setMenu(menu);
             
-        menuRepository.saveAndFlush(menu);
-        mealRepository.saveAllAndFlush(List.of(soup, fish, meat));
+        menuRepository.save(menu);
+        mealRepository.saveAll(List.of(soup, fish, meat));
 
         return menu;
     }
