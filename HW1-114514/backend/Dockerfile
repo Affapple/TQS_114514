@@ -12,4 +12,9 @@ FROM eclipse-temurin:21-alpine
 WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
 
+# Add these environment variables for better logging
+ENV JAVA_OPTS="-Dspring.output.ansi.enabled=always -Dlogging.level.root=INFO"
+ENV TZ=UTC
+
+# Use exec form of ENTRYPOINT
 ENTRYPOINT ["java", "-jar", "app.jar"]

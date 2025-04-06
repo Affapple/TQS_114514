@@ -27,21 +27,23 @@ function App() {
         switchMode: switchMode,
       }}
     >
-      <Navbar />
-      <Weather />
-      <main>
-        <div className={styles.mainContent}>
-          <BrowserRouter>
+      <BrowserRouter>
+        <Navbar />
+        <Weather />
+        <main>
+          <div className={styles.mainContent}>
             <Routes>
               <Route path="/" element={<Restaurants />} />
               <Route path="/restaurant/:id" element={<Menus />} />
-              <Route path="/restaurant/:id/reservations" element={<Reservations />} />
-              <Route path="/reservation/:code" element={<UserReservation />} />
+              <Route
+                path="/restaurant/:id/reservations"
+                element={<Reservations />}
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
-        </div>
-      </main>
+          </div>
+        </main>
+      </BrowserRouter>
     </AppContext.Provider>
   );
 }

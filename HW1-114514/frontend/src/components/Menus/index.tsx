@@ -191,7 +191,6 @@ export default function Menus() {
     setLoading(true);
     const response = await createReservation(reservationRequest);
 
-    console.log(response);
     if (response.status === 201) {
       setReservationCode([response.data.code]);
       setReservationSuccess(true);

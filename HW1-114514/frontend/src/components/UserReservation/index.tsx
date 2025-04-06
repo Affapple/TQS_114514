@@ -1,12 +1,21 @@
-import { getReservation } from "@api/Reservation";
 import { Reservation } from "@Types/Reservation";
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import styles from './styles.module.css';
+import { cancelReservation } from "@api/Reservation";
+import { useState } from "react";
 
-function UserReservation({ reservation }: { reservation: Reservation }) {
-  const [error, setError] = useState<string>("");
+function UserReservation({ reservation, setReservation }: { reservation: Reservation, setReservation: (reservation: Reservation) => void   }) {
+  const [message, setMessage] = useState<string>("");
 
+  const handleCancelReservation = async () => {
+    const response = await cancelReservation(reservation.code);
+    setReservation({...reservation, status: "CANCELLED"});
+    if (response.status === 200) {
+      setMessage("Reservation cancelled successfully");
+    } else {
+      setMessage("Failed to cancel reservation");
+    }
+  }
+  
   return (
       <div className={styles.reservationCard}>
         <h2 className={styles.title}>Reservation Details</h2>
@@ -19,16 +28,11 @@ function UserReservation({ reservation }: { reservation: Reservation }) {
             <span className={styles.label}>Status:</span>
             <span className={styles.value}>{reservation.status}</span>
           </div>
-          <div className={styles.detailRow}>
-            <span className={styles.label}>Restaurant ID:</span>
-            <span className={styles.value}>{reservation.restaurantId}</span>
-          </div>
-          <div className={styles.detailRow}>
-            <span className={styles.label}>Menu ID:</span>
-            <span className={styles.value}>{reservation.menuId}</span>
+          <button className={styles.cancelButton} onClick={handleCancelReservation}>Cancel Reservation</button>
         </div>
+
+        {message && <span className={styles.message}>{message}</span>}
       </div>
-    </div>
   );
 }
 

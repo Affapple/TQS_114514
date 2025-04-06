@@ -8,12 +8,10 @@
 }
 
 .reservationCard {
-    padding: 1.5rem;
     max-width: 24rem;
-    margin: 0 auto;
     background-color: white;
     border-radius: 0.75rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    margin: 0 1rem;
 }
 
 .title {
@@ -54,4 +52,13 @@
     color: #4b5563;
     text-align: center;
     padding: 1rem;
+}
+
+.cancelButton {
+    background-color: #dc2626;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
 }

@@ -50,7 +50,9 @@ services:
         "spring.datasource.username": "$DB_USERNAME",
         "spring.datasource.password": "$DB_PASSWORD",
         "spring.jpa.hibernate.ddl-auto": "update",
-        "springdoc.api-docs.path": "/api/v1/docs"
+        "springdoc.api-docs.path": "/api/v1/docs",
+        "weatherapi.key": "$WEATHERAPI_KEY",
+        "cache.ttl": "$CACHE_TTL"
       }'
 
 volumes:

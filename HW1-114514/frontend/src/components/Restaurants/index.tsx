@@ -27,6 +27,9 @@ export default function Restaurants() {
   }, []);
 
   const openModal = () => {
+    setReservationCode("");
+    setReservation(null);
+    setError("");
     setShowModal(true);
   };
 
@@ -39,6 +42,7 @@ export default function Restaurants() {
       setError("Código da reserva inválido");
       return;
     }
+    setError("");
 
     const fetchReservation = async () => {
       const response = await getReservation(reservationCode);
@@ -83,7 +87,9 @@ export default function Restaurants() {
           <div className={styles.modal}>
             <div className={styles.modalContent}>
               {reservation && !error ? (
-                <UserReservation reservation={reservation} />
+                <>
+                  <UserReservation reservation={reservation} setReservation={setReservation}/>
+                </>
               ) : (
                 <>
                   <h2>Procurar uma reserva</h2>
@@ -104,16 +110,16 @@ export default function Restaurants() {
                       >
                         Procurar
                       </button>
-                      <button
-                        onClick={() => closeModal()}
-                        className={styles.cancelButton + " " + styles.bigButton}
-                      >
-                        Fechar
-                      </button>
                     </div>
                   </div>
                 </>
               )}
+              <button
+                onClick={() => closeModal()}
+                className={styles.bigButton}
+              >
+                Fechar
+              </button>
             </div>
           </div>
         </div>

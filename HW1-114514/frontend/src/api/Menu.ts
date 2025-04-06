@@ -3,7 +3,6 @@ import { MealDTO } from "@Types/MealDTO";
 import { MenuRequestDTO } from "@Types/MenuRequestDTO";
 
 function createMenu(menuRequest: MenuRequestDTO) {
-  console.log('Creating menu with request:', JSON.stringify(menuRequest, null, 2));
   const response = apiClient.post("/menu", menuRequest);
   return response;
 }
