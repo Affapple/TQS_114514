@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres
+    restart: always
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
+
+    environment:
+      POSTGRES_USER: $DB_USERNAME
+      POSTGRES_PASSWORD: $DB_PASSWORD 
+      POSTGRES_DB: $DB_NAME 
+
+    ports:
+      - 5432:5432
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - network 
+
+  # frontend:
+  #   depends_on:
+  #     - backend
+  #
+  #   build:
+  #     context: ./frontend
+  #
+  #   networks:
+  #     - network 
+  #
+  #   ports:
+  #     - "5173:5173"
+
+  backend:
+    depends_on:
+      - postgres
+
+    build:
+      context: ./backend
+
+    networks:
+      - network 
+
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "spring.application.name": "backend",
+        "spring.datasource.url": "jdbc:postgresql://postgres:5432/$DB_NAME",
+        "spring.datasource.username": "$DB_USERNAME",
+        "spring.datasource.password": "$DB_PASSWORD",
+        "spring.jpa.hibernate.ddl-auto": "update",
+        "springdoc.api-docs.path": "/api/v1/docs"
+      }'
+
+volumes:
+  postgres_data:
+
+networks:
+  network:
+    driver: bridge

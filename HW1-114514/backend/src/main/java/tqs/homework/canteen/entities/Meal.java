@@ -1,0 +1,45 @@
+package tqs.homework.canteen.entities;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.*;
+import lombok.*;
+import tqs.homework.canteen.EnumTypes.MealType;
+import tqs.homework.canteen.EnumTypes.MealTypeConverter;
+
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString(exclude = {"menu"})
+@Table(name = "meal", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"menu_id", "type"})
+})
+public class Meal {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "meal_type")
+    @Convert(converter = MealTypeConverter.class)
+    private MealType type;
+
+    @ManyToOne
+    @JsonIgnore
+    private Menu menu;
+    
+    @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Reservation> reservations = new ArrayList<>();
+
+    public Meal(String description, MealType type, Menu menu) {
+        this.description = description;
+        this.type = type;
+        this.menu = menu;
+    }
+}
