@@ -5,6 +5,11 @@
 }
 
 .header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
   margin-bottom: 24px;
   border-bottom: 1px solid #eaeaea;
   padding-bottom: 16px;
@@ -12,8 +17,9 @@
 
 .restaurantInfo {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 16px;
+  justify-content: center;
   margin-bottom: 16px;
 }
 
@@ -27,6 +33,13 @@
   color: #666;
   font-size: 16px;
 }
+
+.buttonsContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
 
 .menusContainer {
   width: 100%;
@@ -275,7 +288,7 @@
   margin-top: 20px;
 }
 
-.formActions button {
+.bigButton {
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
@@ -283,17 +296,17 @@
   font-size: 14px;
 }
 
-.formActions button:first-child {
+.confirmButton {
   background-color: #4CAF50;
   color: white;
 }
 
-.formActions button:last-child {
+.cancelButton{
   background-color: #f44336;
   color: white;
 }
 
-.formActions button:hover {
+button:hover {
   opacity: 0.9;
 }
 
@@ -355,11 +368,31 @@
   background-color: #d32f2f;
 }
 
-/* Dark mode styles */
-.darkMode .mealOption {
-  background-color: #333;
+
+.modalContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.darkMode .mealOptionsSection h3 {
-  color: #f5f5f5;
+
+.modal {
+  width: 30rem;
+  min-height: 200px;
+  background-color: #FFF;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.modalContent {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
 }

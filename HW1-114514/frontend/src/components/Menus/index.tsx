@@ -1,6 +1,6 @@
 import { getRestaurantById, getRestaurantMenus } from "@api/Restaurant";
 import { createMenu } from "@api/Menu";
-import { AppContext } from "@hooks/AppContext";
+import { AppContext, Mode } from "@hooks/AppContext";
 import { Menu } from "@Types/Menu";
 import { Restaurant } from "@Types/Restaurant";
 import { MenuRequestDTO } from "@Types/MenuRequestDTO";
@@ -19,25 +19,28 @@ import { pt } from "date-fns/locale";
 import { MealDTO } from "@Types/MealDTO";
 import { createReservation } from "@api/Reservation";
 import { ReservationRequestDTO } from "@Types/ReservationRequestDTO";
+import { useNavigate, useParams } from "react-router-dom";
 
-interface MenusProps {
-  selectedRestaurant: number;
-  setTitle: Dispatch<SetStateAction<string>>;
-}
 
-export default function Menus({ selectedRestaurant, setTitle }: MenusProps) {
+export default function Menus() {
+  const navigate = useNavigate();
+  const { id: restaurantId } = useParams<{id: string}>();
   const { mode } = useContext(AppContext);
   const [restaurant, setRestaurant] = useState<Restaurant>();
   const [menus, setMenus] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddMenu, setShowAddMenu] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [reservationCode, setReservationCode] = useState<string[]>([]);
+  const [reservationSuccess, setReservationSuccess] = useState(false);
   const [newMenu, setNewMenu] = useState<MenuRequestDTO>({
-    restaurantId: selectedRestaurant,
+    restaurantId: restaurant?.id,
     date: new Date(),
     options: [],
     time: MenuTime.LUNCH,
   });
+  
   const [mealOptions, setMealOptions] = useState<Array<MealDTO>>([
     {
       description: "sopa de pato",
@@ -57,16 +60,15 @@ export default function Menus({ selectedRestaurant, setTitle }: MenusProps) {
   ]);
 
   useEffect(() => {
+
+
     const fetchRestaurant = async () => {
       try {
         setLoading(true);
-        const response = await getRestaurantById(selectedRestaurant);
+        const response = await getRestaurantById(restaurantId);
 
         if (response.status === 200) {
           setRestaurant(response.data);
-          setTitle(
-            `Ementas de ${response.data.name} (${response.data.location})`
-          );
         } else {
           setError("Não foi possível carregar os dados do restaurante.");
         }
@@ -79,7 +81,7 @@ export default function Menus({ selectedRestaurant, setTitle }: MenusProps) {
     };
 
     fetchRestaurant();
-  }, [selectedRestaurant, setTitle]);
+  }, []);
 
   useEffect(() => {
     if (restaurant) {
@@ -125,12 +127,11 @@ export default function Menus({ selectedRestaurant, setTitle }: MenusProps) {
     }
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (date: Date) => {
     try {
-      const date = new Date(dateString);
       return format(date, "EEEE, d 'de' MMMM", { locale: pt });
     } catch {
-      return dateString;
+      return date.toISOString();
     }
   };
 
@@ -141,7 +142,7 @@ export default function Menus({ selectedRestaurant, setTitle }: MenusProps) {
       const menuResponse = await createMenu(menuRequest);
       if (menuResponse.status === 201) {
         // Refresh menus after adding
-        const updatedMenus = await getRestaurantMenus(selectedRestaurant);
+        const updatedMenus = await getRestaurantMenus(restaurant.id);
         if (updatedMenus.status === 200) {
           setMenus(updatedMenus.data);
         }
@@ -182,20 +183,34 @@ export default function Menus({ selectedRestaurant, setTitle }: MenusProps) {
     setMealOptions(updatedMeals);
   };
 
-
-  const reserveMeal = async (menuId: number) => {
+  const reserveMeal = async (mealId: number) => {
     const reservationRequest: ReservationRequestDTO = {
-      mealId: mealId
+      mealId: mealId,
     };
 
+    setLoading(true);
     const response = await createReservation(reservationRequest);
+
+    console.log(response);
     if (response.status === 201) {
-      console.log("Reserva criada com sucesso");
+      setReservationCode([response.data.code]);
+      setReservationSuccess(true);
     } else {
-      console.error("Erro ao criar reserva");
+      setError("Erro ao criar reserva: " + response.data.message);
+      setReservationSuccess(false);
     }
+    setShowModal(true);
+    setLoading(false);
   };
 
+  const closeModal = () => {
+    setShowModal(false);
+    setReservationCode([]);
+    setReservationSuccess(false);
+    setError("");
+  };
+
+  
   if (loading) {
     return (
       <div className={styles.loading}>
@@ -203,7 +218,7 @@ export default function Menus({ selectedRestaurant, setTitle }: MenusProps) {
       </div>
     );
   }
-
+  
   if (error) {
     return (
       <div className={styles.emptyState}>
@@ -229,20 +244,27 @@ export default function Menus({ selectedRestaurant, setTitle }: MenusProps) {
     <div className={`${styles.container}`}>
       <div className={styles.header}>
         <div className={styles.restaurantInfo}>
-          <div>
-            <h1 className={styles.restaurantName}>{restaurant.name}</h1>
-            <div className={styles.restaurantLocation}>
-              {restaurant.location}
-            </div>
+          <h1 className={styles.restaurantName}>{restaurant.name}</h1>
+          <div className={styles.restaurantLocation}>
+            {restaurant.location}
           </div>
         </div>
         {mode === "Worker" && (
-          <button
-            className={styles.addMenuButton}
-            onClick={() => setShowAddMenu(true)}
-          >
-            Adicionar Menu
-          </button>
+          <div className={styles.buttonsContainer}>
+            <button
+              className={styles.addMenuButton}
+              onClick={() => setShowAddMenu(true)}
+            >
+              Adicionar Menu
+            </button>
+            <button
+              style={{marginLeft: "10px"}}
+              className={styles.addMenuButton}
+              onClick={() => navigate(`/restaurant/${restaurantId}/reservations`)}
+            >
+              Ver Reservas
+            </button>
+          </div>
         )}
       </div>
 
@@ -314,8 +336,18 @@ export default function Menus({ selectedRestaurant, setTitle }: MenusProps) {
           </div>
 
           <div className={styles.formActions}>
-            <button onClick={handleAddMenu}>Confirmar</button>
-            <button onClick={() => setShowAddMenu(false)}>Cancelar</button>
+            <button
+              onClick={handleAddMenu}
+              className={styles.confirmButton + " " + styles.bigButton}
+            >
+              Confirmar
+            </button>
+            <button
+              onClick={() => setShowAddMenu(false)}
+              className={styles.cancelButton + " " + styles.bigButton}
+            >
+              Cancelar
+            </button>
           </div>
         </div>
       )}
@@ -332,52 +364,78 @@ export default function Menus({ selectedRestaurant, setTitle }: MenusProps) {
         <div className={styles.menusContainer}>
           <div className={styles.menusGrid}>
             {menus.map((menu) => (
-              <>
-                <div key={menu.id} className={styles.menuCard}>
-                  <div className={styles.menuHeader}>
-                    <div className={styles.menuDate}>
-                      {formatDate(menu.date)}
-                    </div>
-                    <div className={styles.menuTime}>
-                      {menu.time === MenuTime.LUNCH ? "Almoço" : "Jantar"}
-                    </div>
+              <div key={menu.id} className={styles.menuCard}>
+                <div className={styles.menuHeader}>
+                  <div className={styles.menuDate}>{formatDate(menu.date)}</div>
+                  <div className={styles.menuTime}>
+                    {menu.time === MenuTime.LUNCH ? "Almoço" : "Jantar"}
                   </div>
-                  <div className={styles.menuContent}>
-                    <div className={styles.menuCapacity}>
-                      <span className={styles.capacityIcon}>👥</span>
-                      <span>Capacidade: {menu.capacity} pessoas</span>
-                    </div>
-                    <div className={styles.mealList}>
-                      {menu.options.map((meal) => (
-                        <>
-                          <div key={meal.id} className={styles.mealItem}>
-                            <div
-                              className={`${styles.mealType} ${getMealTypeClass(
-                                meal.type
-                              )}`}
-                            >
-                              {meal.type === "SOUP"
-                                ? "Sopa"
-                                : meal.type === "MEAT"
-                                ? "Carne"
-                                : "Peixe"}
-                            </div>
-                            <div className={styles.mealDescription}>
-                              {meal.description}
-                            </div>
-                          </div>
-                        </>
-                      ))}
-                    </div>
-                  </div>
-                <button className={styles.addMealButton} onClick={reserveMeal}>
-                  Reservar refeição
-                </button>
                 </div>
-              </>
+                <div className={styles.menuContent}>
+                  <div className={styles.menuCapacity}>
+                    <span className={styles.capacityIcon}>👥</span>
+                    <span>Capacidade: {menu.capacity} pessoas</span>
+                  </div>
+                  <div className={styles.mealList}>
+                    {menu.options.map((meal) => (
+                      <div key={meal.id} className={styles.mealItem}>
+                        <div
+                          className={`${styles.mealType} ${getMealTypeClass(
+                            meal.type
+                          )}`}
+                        >
+                          {meal.type === "SOUP"
+                            ? "Sopa"
+                            : meal.type === "MEAT"
+                            ? "Carne"
+                            : "Peixe"}
+                        </div>
+                        <div className={styles.mealDescription}>
+                          {meal.description}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                    <button
+                      className={styles.addMealButton}
+                      onClick={() => reserveMeal(menu.options[0].id)}
+                    >
+                      Reservar refeição
+                    </button>
+              </div>
             ))}
           </div>
         </div>
+      )}
+
+      {showModal ? (
+        <div className={styles.modalContainer}>
+          <div className={styles.modal}>
+            <div className={styles.modalContent}>
+              {reservationSuccess ? (
+                <>
+                  <h2>Reserva criada com sucesso</h2>
+                  <p>Codigo(s) de reserva: {reservationCode.join(", ")}</p>
+                </>
+              ) : (
+                <>
+                  <h2>Erro ao criar reserva</h2>
+                  <p>{error}</p>
+                </>
+              )}
+              <button
+                onClick={closeModal}
+                className={styles.bigButton + " " + styles.cancelButton}
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <></>
       )}
     </div>
   );

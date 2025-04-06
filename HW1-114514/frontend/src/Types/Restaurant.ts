@@ -3,4 +3,5 @@ export interface Restaurant {
   name: string;
   location: string;
   capacity: number;
+  menus: any[];
 }

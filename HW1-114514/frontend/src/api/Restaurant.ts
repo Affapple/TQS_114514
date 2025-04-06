@@ -14,7 +14,7 @@ function createRestaurant(restaurant: Restaurant): Promise<AxiosResponse<Restaur
   return response;
 }
 
-function getRestaurantById(id: number): Promise<AxiosResponse<Restaurant>> {
+function getRestaurantById(id: number | string): Promise<AxiosResponse<Restaurant>> {
   const response = apiClient.get(`/restaurants/${id}`);
   return response;
 }
