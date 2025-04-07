@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReservationService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">canteen</a> &gt; <a href="index.source.html" class="el_package">tqs.homework.canteen.services</a> &gt; <span class="el_source">ReservationService.java</span></div><h1>ReservationService.java</h1><pre class="source lang-java linenums">package tqs.homework.canteen.services;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import tqs.homework.canteen.DTOs.ReservationRequestDTO;
+import tqs.homework.canteen.EnumTypes.MenuTime;
+import tqs.homework.canteen.EnumTypes.ReservationStatus;
+import tqs.homework.canteen.entities.Meal;
+import tqs.homework.canteen.entities.Menu;
+import tqs.homework.canteen.entities.Reservation;
+import tqs.homework.canteen.repositories.MealRepository;
+import tqs.homework.canteen.repositories.MenuRepository;
+import tqs.homework.canteen.repositories.ReservationRepository;
+import tqs.homework.canteen.repositories.RestaurantRepository;
+
+@Service
+<span class="fc" id="L23">public class ReservationService implements IReservationService {</span>
+<span class="fc" id="L24">    private static final Logger logger = LoggerFactory.getLogger(ReservationService.class);</span>
+
+    @Autowired
+    private ReservationRepository reservationRepository;
+    @Autowired
+    private RestaurantRepository restaurantRepository;
+    @Autowired
+    private MealRepository mealRepository;
+    @Autowired
+    private MenuRepository menuRepository;
+
+
+    public Reservation createReservation(ReservationRequestDTO requestDTO) {
+<span class="fc" id="L37">        Meal meal = mealRepository</span>
+<span class="fc" id="L38">            .findById(requestDTO.getMealId())</span>
+<span class="fc" id="L39">            .orElseThrow(</span>
+<span class="fc" id="L40">                () -&gt; new NoSuchElementException(&quot;Meal with id \&quot;&quot; + requestDTO.getMealId() + &quot;\&quot; not found!&quot;)</span>
+            );
+    
+<span class="fc" id="L43">        Menu menu = meal.getMenu();</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (menu.getCapacity() &lt;= 0) {</span>
+<span class="fc" id="L45">            throw new IllegalArgumentException(&quot;Cannot create reservation. Restaurant is full!&quot;);</span>
+        }
+
+<span class="fc" id="L48">        menu.setCapacity(menu.getCapacity() - 1);</span>
+<span class="fc" id="L49">        menuRepository.save(menu);</span>
+
+<span class="fc" id="L51">        Reservation reservation = new Reservation();</span>
+<span class="fc" id="L52">        reservation.setMeal(meal);</span>
+<span class="fc" id="L53">        reservation.setStatus(ReservationStatus.ACTIVE);</span>
+<span class="fc" id="L54">        reservation.generateCode();</span>
+
+<span class="fc" id="L56">        return reservationRepository.save(reservation);</span>
+    }
+
+    public Reservation getReservationByCode(String code) {
+<span class="fc" id="L60">        Reservation reservation = reservationRepository</span>
+<span class="fc" id="L61">            .findById(code)</span>
+<span class="fc" id="L62">            .orElseThrow(</span>
+<span class="fc" id="L63">                () -&gt; new NoSuchElementException(&quot;Reservation with code \&quot;&quot;+code+&quot;\&quot; not found!&quot;)</span>
+            );
+
+<span class="fc" id="L66">        return reservation;</span>
+    }
+
+    public Reservation cancelReservation(String code) {
+<span class="fc" id="L70">        Reservation reservation = reservationRepository</span>
+<span class="fc" id="L71">            .findById(code)</span>
+<span class="fc" id="L72">            .orElseThrow(</span>
+<span class="fc" id="L73">                () -&gt; new NoSuchElementException(&quot;Reservation with code \&quot;&quot;+code+&quot;\&quot; not found!&quot;)</span>
+            );
+
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        if (reservation.getStatus() != ReservationStatus.ACTIVE) {</span>
+<span class="fc" id="L77">            throw new IllegalArgumentException(&quot;Reservation with code \&quot;&quot;+code+&quot;\&quot; cannot be cancelled! Only active reservations can be cancelled.&quot;);</span>
+        }
+
+<span class="fc" id="L80">        Menu menu = reservation.getMeal().getMenu();</span>
+<span class="fc" id="L81">        menu.setCapacity(menu.getCapacity() + 1);</span>
+<span class="fc" id="L82">        menuRepository.save(menu);</span>
+
+<span class="fc" id="L84">        reservation.setStatus(ReservationStatus.CANCELLED);</span>
+<span class="fc" id="L85">        return reservationRepository.save(reservation);</span>
+    }
+
+    public Reservation checkInReservation(String code) {
+<span class="fc" id="L89">        Reservation reservation = reservationRepository</span>
+<span class="fc" id="L90">            .findById(code)</span>
+<span class="fc" id="L91">            .orElseThrow(</span>
+<span class="fc" id="L92">                () -&gt; new NoSuchElementException(&quot;Reservation with code \&quot;&quot;+code+&quot;\&quot; not found!&quot;)</span>
+            );
+
+<span class="fc bfc" id="L95" title="All 2 branches covered.">        if (reservation.getStatus() != ReservationStatus.ACTIVE) {</span>
+<span class="fc" id="L96">            throw new IllegalArgumentException(&quot;Cannot check-in. Reservation is &quot; + reservation.getStatus().getName());</span>
+        }
+
+<span class="fc" id="L99">        reservation.setStatus(ReservationStatus.USED);</span>
+<span class="fc" id="L100">        return reservationRepository.save(reservation);</span>
+    }
+
+    @Override
+    public List&lt;Reservation&gt; getAllReservations(Long restaurantId, LocalDate date, MenuTime time) {
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        if (!restaurantRepository.existsById(restaurantId)) {</span>
+<span class="fc" id="L106">            throw new NoSuchElementException(&quot;Restaurant with id \&quot;&quot; + restaurantId + &quot;\&quot; not found!&quot;);</span>
+        }
+        
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        if(date == null) {</span>
+<span class="fc" id="L110">            return reservationRepository.findAllByRestaurant_id(restaurantId);</span>
+        }
+
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        if(time == null) {</span>
+<span class="fc" id="L114">            return reservationRepository.findAllByRestaurant_idAndDate(restaurantId, date);</span>
+        }
+
+<span class="fc" id="L117">        return reservationRepository.findAllByRestaurant_idAndDateAndTime(restaurantId, date, time);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

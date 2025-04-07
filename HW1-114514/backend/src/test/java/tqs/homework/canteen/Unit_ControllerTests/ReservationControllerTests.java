@@ -1,5 +1,7 @@
 package tqs.homework.canteen.Unit_ControllerTests;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.Test;
@@ -16,8 +18,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import tqs.homework.canteen.DTOs.ReservationRequestDTO;
+import tqs.homework.canteen.EnumTypes.MenuTime;
 import tqs.homework.canteen.EnumTypes.ReservationStatus;
 import tqs.homework.canteen.controller.ReservationController;
+import tqs.homework.canteen.entities.Meal;
 import tqs.homework.canteen.entities.Reservation;
 import tqs.homework.canteen.services.ReservationService;
 
@@ -28,8 +32,81 @@ public class ReservationControllerTests {
     
     @MockitoBean
     private ReservationService reservationService;
-    
+
     /* GET: /api/v1/reservations */
+    /**
+     * Given an invalid restaurantId 
+     * when getting all reservations of restaurant
+     * then an NoSuchElementException is thrown
+     */
+    @Test
+    public void testGetReservationsOfRestaurant_InvalidRestaurantId() throws Exception {
+        when(reservationService
+        .getAllReservations(anyLong(), Mockito.isNull(LocalDate.class), Mockito.isNull(MenuTime.class)))
+        .thenThrow(new NoSuchElementException());
+
+        mvc.perform(get("/api/v1/reservations?restaurantId=1"))
+            .andExpect(status().isNotFound());
+    }
+
+    /**
+     * Given an valid restaurantId 
+     * when getting all reservations of restaurant
+     * then a list of ALL reservations is returned
+     */
+    @Test
+    public void testGetReservationsOfRestaurant_ValidRestaurantId() throws Exception {
+        when(reservationService
+        .getAllReservations(anyLong(), Mockito.isNull(LocalDate.class), Mockito.isNull(MenuTime.class)))
+        .thenReturn(List.of(
+                new Reservation("CODE", ReservationStatus.ACTIVE, new Meal())
+            )
+        );
+
+        mvc.perform(get("/api/v1/reservations?restaurantId=1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.size()").value(1));
+    }
+
+    /**
+     * Given an valid restaurantId and a date
+     * when getting all reservations of restaurant
+     * then a list of ALL reservations of restaurant is returned
+     */
+    @Test
+    public void testGetReservationsOfRestaurant_ValidRestaurantIdAndDate() throws Exception {
+        when(reservationService
+        .getAllReservations(anyLong(), Mockito.any(LocalDate.class), Mockito.isNull(MenuTime.class)))
+        .thenReturn(List.of(
+                new Reservation("CODE", ReservationStatus.ACTIVE, new Meal())
+            )
+        );
+
+        mvc.perform(get("/api/v1/reservations?restaurantId=1&date=2021-01-01"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.size()").value(1));
+    }
+
+    /**
+     * Given an valid restaurantId and a date and a time
+     * when getting all reservations of restaurant
+     * then a list of ALL reservations of restaurant is returned
+     */
+    @Test
+    public void testGetReservationsOfRestaurant_ValidRestaurantIdAndDateAndTime() throws Exception {
+        when(reservationService
+        .getAllReservations(anyLong(), Mockito.any(LocalDate.class), Mockito.any(MenuTime.class)))
+        .thenReturn(List.of(
+                new Reservation("CODE", ReservationStatus.ACTIVE, new Meal())
+            )
+        );
+
+        mvc.perform(get("/api/v1/reservations?restaurantId=1&date=2021-01-01&time=LUNCH"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.size()").value(1));
+    }
+    
+    /* GET: /api/v1/reservations/{code} */
     /**
      * Given an invalid code
      * when get reservation by code

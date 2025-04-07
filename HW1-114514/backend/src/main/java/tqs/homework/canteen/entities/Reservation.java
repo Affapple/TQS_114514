@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import lombok.*;
-import tqs.homework.canteen.DTOs.ReservationDTO;
 import tqs.homework.canteen.EnumTypes.ReservationStatus;
 import tqs.homework.canteen.EnumTypes.ReservationStatusConverter;
 @Entity
@@ -36,9 +35,5 @@ public class Reservation {
     public String generateCode() {
         code = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         return code;
-    }
-
-    public ReservationDTO asDTO() {
-        return new ReservationDTO(this.code, this.status);
     }
 }

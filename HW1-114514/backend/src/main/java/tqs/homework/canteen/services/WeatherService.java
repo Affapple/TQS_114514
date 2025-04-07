@@ -32,7 +32,7 @@ public class WeatherService implements IWeatherService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Autowired
-    private final Cache<Forecast> cache = new Cache<>();
+    private Cache<Forecast> cache;
     private Long totalCalls = 0L;
 
     @Override

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExceptionHandlers.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">canteen</a> &gt; <a href="index.source.html" class="el_package">tqs.homework.canteen.config</a> &gt; <span class="el_source">ExceptionHandlers.java</span></div><h1>ExceptionHandlers.java</h1><pre class="source lang-java linenums">package tqs.homework.canteen.config;
+
+import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import lombok.Builder;
+
+@RestControllerAdvice
+<span class="fc" id="L16">public class ExceptionHandlers {</span>
+<span class="fc" id="L17">    private static final Logger logger = LoggerFactory.getLogger(ExceptionHandlers.class);</span>
+
+    @Builder
+<span class="fc" id="L20">    static record ErrorResponse(String message, LocalDateTime timestamp) {}</span>
+
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleNoSuchElementException(NoSuchElementException ex) {
+<span class="fc" id="L25">        logger.error(&quot;No such element exception while completing request: {}&quot;, ex.getMessage());</span>
+<span class="fc" id="L26">        logger.error(&quot;Returning 404 Not Found&quot;);</span>
+<span class="fc" id="L27">        return new ResponseEntity&lt;&gt;(</span>
+<span class="fc" id="L28">            ErrorResponse.builder()</span>
+<span class="fc" id="L29">                .message(ex.getMessage())</span>
+<span class="fc" id="L30">                .timestamp(LocalDateTime.now())</span>
+<span class="fc" id="L31">                .build(),</span>
+            HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleIllegalArgumentException(IllegalArgumentException ex) {
+<span class="fc" id="L38">        logger.error(&quot;Illegal argument exception while completing request: {}&quot;, ex.getMessage());</span>
+<span class="fc" id="L39">        logger.error(&quot;Returning 400 Bad Request&quot;);</span>
+<span class="fc" id="L40">        return new ResponseEntity&lt;&gt;(</span>
+<span class="fc" id="L41">            ErrorResponse.builder()</span>
+<span class="fc" id="L42">                .message(ex.getMessage())</span>
+<span class="fc" id="L43">                .timestamp(LocalDateTime.now())</span>
+<span class="fc" id="L44">                .build(),</span>
+            HttpStatus.BAD_REQUEST
+        );
+    }
+    
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleGenericException(Exception ex) {
+<span class="nc" id="L52">        logger.error(&quot;Generic exception while completing request: {}&quot;, ex.getMessage(), ex);</span>
+<span class="nc" id="L53">        logger.error(&quot;Returning 500 Internal Server Error&quot;);</span>
+        
+<span class="nc" id="L55">        return new ResponseEntity&lt;&gt;(</span>
+<span class="nc" id="L56">            ErrorResponse.builder()</span>
+<span class="nc" id="L57">                .message(&quot;An unexpected error occurred: &quot; + ex.getMessage())</span>
+<span class="nc" id="L58">                .timestamp(LocalDateTime.now())</span>
+<span class="nc" id="L59">                .build(),</span>
+            HttpStatus.INTERNAL_SERVER_ERROR
+        );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

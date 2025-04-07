@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MenuService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">canteen</a> &gt; <a href="index.source.html" class="el_package">tqs.homework.canteen.services</a> &gt; <span class="el_source">MenuService.java</span></div><h1>MenuService.java</h1><pre class="source lang-java linenums">package tqs.homework.canteen.services;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import tqs.homework.canteen.DTOs.MealDTO;
+import tqs.homework.canteen.DTOs.MenuRequestDTO;
+import tqs.homework.canteen.entities.Meal;
+import tqs.homework.canteen.entities.Menu;
+import tqs.homework.canteen.entities.Restaurant;
+import tqs.homework.canteen.repositories.MealRepository;
+import tqs.homework.canteen.repositories.MenuRepository;
+import tqs.homework.canteen.repositories.RestaurantRepository;
+
+@Service
+<span class="fc" id="L21">public class MenuService implements IMenuService {</span>
+<span class="fc" id="L22">    private static final Logger logger = LoggerFactory.getLogger(MenuService.class);</span>
+    @Autowired
+    private RestaurantRepository restaurantRepository;
+    @Autowired
+    private MenuRepository menuRepository;
+    @Autowired
+    private MealRepository mealRepository;
+
+    @Override
+    public Menu addMeal(MealDTO meal) {
+<span class="fc" id="L32">        Menu menu = menuRepository.findById(meal.getMenuId())</span>
+<span class="fc" id="L33">            .orElseThrow(() -&gt; new NoSuchElementException(&quot;Menu with id \&quot;&quot; + meal.getMenuId() + &quot;\&quot; not found!&quot;)</span>
+        );
+        
+<span class="fc" id="L36">        List&lt;Meal&gt; options = menu.getOptions();</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        if ( options.stream().anyMatch( m -&gt; m.getType().equals(meal.getType()) ) ) {</span>
+<span class="fc" id="L38">            throw new IllegalArgumentException(&quot;Meal of type \&quot;&quot; + meal.getType() + &quot;\&quot; already exists in menu with id \&quot;&quot; + meal.getMenuId() + &quot;\&quot;!&quot;);</span>
+        }
+
+<span class="fc" id="L41">        logger.info(&quot;Adding meal to menu: {}&quot;, meal);</span>
+<span class="fc" id="L42">        Meal newMeal = mealRepository.save(new Meal(meal.getDescription(), meal.getType(), menu));</span>
+<span class="fc" id="L43">        options.add(newMeal);</span>
+<span class="fc" id="L44">        menu.setOptions(options);</span>
+<span class="fc" id="L45">        return menuRepository.save(menu);</span>
+    }
+
+    @Override
+    public Menu addMeals(Long menuId, List&lt;MealDTO&gt; meals) {
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        if (!menuRepository.existsById(menuId)) {</span>
+<span class="nc" id="L51">            throw new NoSuchElementException(&quot;Menu with id \&quot;&quot; + menuId + &quot;\&quot; not found!&quot;);</span>
+        }
+
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">        for (MealDTO meal : meals) {</span>
+<span class="nc" id="L55">            meal.setMenuId(menuId);</span>
+            try {
+<span class="nc" id="L57">                addMeal(meal);</span>
+<span class="nc" id="L58">            } catch (IllegalArgumentException e) </span>
+            {
+<span class="nc" id="L60">                logger.error(&quot;Error adding meal to menu: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L61">            }</span>
+<span class="nc" id="L62">        }</span>
+<span class="fc" id="L63">        return menuRepository.findById(menuId).get();</span>
+    }
+
+    @Override
+    public Menu createNewMenu(MenuRequestDTO menuRequest) {
+<span class="fc" id="L68">        Restaurant restaurant = restaurantRepository.findById(menuRequest.getRestaurantId())</span>
+<span class="fc" id="L69">            .orElseThrow(() -&gt; new NoSuchElementException(&quot;Restaurant with id \&quot;&quot; + menuRequest.getRestaurantId() + &quot;\&quot; not found!&quot;));</span>
+
+<span class="fc" id="L71">        List&lt;Menu&gt; menus = restaurant.getMenus();</span>
+<span class="pc bpc" id="L72" title="2 of 6 branches missed.">        if (menus.stream().anyMatch(m -&gt; m.getDate().equals(menuRequest.getDate()) &amp;&amp; m.getTime().equals(menuRequest.getTime()))) {</span>
+<span class="fc" id="L73">            throw new IllegalArgumentException(&quot;Menu with date \&quot;&quot; + menuRequest.getDate() + &quot;\&quot; and time \&quot;&quot; + menuRequest.getTime().getName() + &quot;\&quot; already exists in restaurant with id \&quot;&quot; + menuRequest.getRestaurantId() + &quot;\&quot;!&quot;);</span>
+        }
+
+<span class="fc" id="L76">        logger.info(&quot;Creating new menu: {}&quot;, menuRequest);</span>
+<span class="fc" id="L77">        Menu menu = menuRepository.save(</span>
+<span class="fc" id="L78">            new Menu(menuRequest.getDate(), menuRequest.getTime(), restaurant)</span>
+        );
+
+<span class="fc" id="L81">        return addMeals(menu.getId(), menuRequest.getOptions());</span>
+    }
+
+    @Override
+    public List&lt;Meal&gt; getMeals(Long menuId) {
+<span class="fc" id="L86">        Menu menu = menuRepository.findById(menuId)</span>
+<span class="fc" id="L87">            .orElseThrow(() -&gt; new NoSuchElementException(&quot;Menu with id \&quot;&quot; + menuId + &quot;\&quot; not found!&quot;));</span>
+
+<span class="fc" id="L89">        return menu.getOptions();</span>
+    }
+
+    @Override
+    public List&lt;Menu&gt; getMenusByRestaurantId(Long restaurantId) {
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        if (!restaurantRepository.existsById(restaurantId)) {</span>
+<span class="fc" id="L95">            throw new NoSuchElementException(&quot;Restaurant with id \&quot;&quot; + restaurantId + &quot;\&quot; not found!&quot;);</span>
+        }
+
+<span class="fc" id="L98">        return menuRepository.findByRestaurant_id(restaurantId);</span>
+    }
+
+    @Override
+    public List&lt;Menu&gt; getMenusOfRestaurantBetweenDates(Long restaurantId, LocalDate from, LocalDate to) {
+<span class="fc bfc" id="L103" title="All 2 branches covered.">        if (!restaurantRepository.existsById(restaurantId)) {</span>
+<span class="fc" id="L104">            throw new NoSuchElementException(&quot;Restaurant with id \&quot;&quot; + restaurantId + &quot;\&quot; not found!&quot;);</span>
+        }
+<span class="fc bfc" id="L106" title="All 2 branches covered.">        if (from == null) {</span>
+<span class="fc" id="L107">            from = LocalDate.now();</span>
+        }
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        if (to == null) {</span>
+<span class="fc" id="L110">            to = LocalDate.now().plusDays(7);</span>
+        }
+
+<span class="fc" id="L113">        return menuRepository.findByRestaurant_idAndDateBetween(restaurantId, from, to);</span>
+    }
+
+    @Override
+    public void deleteMenu(Long menuId) {
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        if (!menuRepository.existsById(menuId)) {</span>
+<span class="nc" id="L119">            throw new NoSuchElementException(&quot;Menu with id \&quot;&quot; + menuId + &quot;\&quot; not found!&quot;);</span>
+        }
+
+<span class="nc" id="L122">        menuRepository.deleteById(menuId);</span>
+<span class="nc" id="L123">    }</span>
+
+    @Override
+    public void deleteMeal(Long menuId, Long mealId) {
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        if (!menuRepository.existsById(menuId)) {</span>
+<span class="nc" id="L128">            throw new NoSuchElementException(&quot;Menu with id \&quot;&quot; + menuId + &quot;\&quot; not found!&quot;);</span>
+        }
+<span class="nc bnc" id="L130" title="All 2 branches missed.">        if (!mealRepository.existsByMenu_idAndId(menuId, mealId)) {</span>
+<span class="nc" id="L131">            throw new NoSuchElementException(&quot;Meal with id \&quot;&quot; + mealId + &quot;\&quot; not found in menu with id \&quot;&quot; + menuId + &quot;\&quot;!&quot;);</span>
+        }
+
+<span class="nc" id="L134">        mealRepository.deleteById(mealId);</span>
+<span class="nc" id="L135">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

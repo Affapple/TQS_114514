@@ -514,7 +514,7 @@ class MenuServiceTests {
 
         assertThrowsExactly(
             NoSuchElementException.class,
-            () -> menuService.addMeal(new MealDTO(1L, "Meal 1", MealType.MEAT)),
+            () -> menuService.addMeals(1L, List.of(new MealDTO(1L, "Meal 1", MealType.MEAT))),
             "No error thrown when attempting to add multiple meals to non-existent menu!"
         );
     }
@@ -526,16 +526,169 @@ class MenuServiceTests {
     @Test
     public void whenAddingMultipleMeals_thenAllMealsAreAdded() {
         Menu menu = new Menu(1L, LocalDate.now(), MenuTime.LUNCH, 10, new Restaurant(1L, "Test Restaurant", "Test Location", 10, new ArrayList<>()), new ArrayList<>());
-        
+
         when(menuRepository.existsById(anyLong())).thenReturn(true);
         when(menuRepository.findById(anyLong())).thenReturn(Optional.of(menu));
         when(menuRepository.save(Mockito.any(Menu.class))).thenReturn(menu);
-        when(mealRepository.save(Mockito.any(Meal.class))).thenReturn(new Meal("Meal 1", MealType.MEAT, menu));
+        when(mealRepository.save(Mockito.any(Meal.class))).thenAnswer( invocation -> {
+            Meal meal = invocation.getArgument(0);
+            meal.setMenu(menu);
+            return meal;
+        });
 
-        menuService.addMeal(new MealDTO(1L, "Meal 1", MealType.MEAT));
-        menuService.addMeal(new MealDTO(1L, "Meal 2", MealType.FISH));
+        menuService.addMeals(
+            1L, 
+            List.of(
+                new MealDTO(null, "Meal 1", MealType.MEAT),
+                new MealDTO(null, "Meal 2", MealType.FISH)
+            )
+        );        
+
         
+        assertThat(
+            menu.getOptions(),
+            hasSize(2)
+        );
+        assertThat(
+            menu.getOptions().getFirst().getDescription(),
+            is("Meal 1")
+        );
+        assertThat(
+            menu.getOptions().getLast().getDescription(),
+            is("Meal 2")
+        );
+    }
+
+
+    /**
+     * Given menu exists
+     * when add repeated meal
+     * then meal is not added to menu
+     */
+    @Test
+    public void whenAddingRepeatedMeal_thenRepeatedMealIsNotAdded() {
+        Menu menu = new Menu(1L, LocalDate.now(), MenuTime.LUNCH, 10, new Restaurant(1L, "Test Restaurant", "Test Location", 10, new ArrayList<>()), new ArrayList<>());
+
+        when(menuRepository.existsById(anyLong())).thenReturn(true);
+        when(menuRepository.findById(anyLong())).thenReturn(Optional.of(menu));
+        when(menuRepository.save(Mockito.any(Menu.class))).thenReturn(menu);
+        when(mealRepository.save(Mockito.any(Meal.class))).thenAnswer( invocation -> {
+            Meal meal = invocation.getArgument(0);
+            meal.setMenu(menu);
+            return meal;
+        });
+
+              
+        menuService.addMeals(
+            1L, 
+            List.of(
+                new MealDTO(null, "Meal 1", MealType.MEAT), 
+                new MealDTO(null, "Meal 2", MealType.MEAT)
+            )
+        );        
+
+        assertThat(
+            menu.getOptions(),
+            hasSize(1)
+        );
+    }
+
+
+    /**
+     * Given Menu doesnt exists
+     * when delete menu 
+     * then throw NoSuchElement
+     */
+    @Test
+    public void whenDeletingNonExistentMenu_thenThrowError() {
+        when(menuRepository.existsById(anyLong())).thenReturn(false);
+
+        assertThrowsExactly(
+            NoSuchElementException.class,
+            () -> menuService.deleteMenu(1L),
+            "No error thrown when attempting to delete non-existent menu!"
+        );
+    }
+
+    /**
+     * Given menu exists
+     * when delete menu
+     * then delete menu
+     */
+    @Test
+    public void whenDeletingMenu_thenMenuIsDeleted() {
+        Menu menu = new Menu(1L, LocalDate.now(), MenuTime.LUNCH, 10, new Restaurant(1L, "Test Restaurant", "Test Location", 10, new ArrayList<>()), new ArrayList<>());
+
+        when(menuRepository.existsById(anyLong())).thenReturn(true);
+        doNothing().when(menuRepository).deleteById(anyLong());
+
+        assertDoesNotThrow(() -> menuService.deleteMenu(1L));
+    }
+
+    /**
+     * Given menu doesnt exists
+     * when delete meal
+     * then throw NoSuchElement
+     */
+    @Test
+    public void whenDeletingMealFromNonExistentMenu_thenThrowError() {
+        when(menuRepository.existsById(anyLong())).thenReturn(false);
         
+        assertThrowsExactly(
+            NoSuchElementException.class,
+            () -> menuService.deleteMeal(1L, 1L),
+            "No error thrown when attempting to delete meal from non-existent menu!"
+        );
+    }
+
+    /**
+     * Given menu doesnt exists
+     * when delete meal
+     * then Throw NoSuchElement
+     */
+    @Test
+    public void whenDeletingMealFromExistentMenu_thenThrowError() {
+        when(menuRepository.existsById(anyLong())).thenReturn(false);
+        
+        assertThrowsExactly(
+            NoSuchElementException.class,
+            () -> menuService.deleteMeal(1L, 1L),
+            "No error thrown when attempting to delete meal from non-existent menu!"
+        );
+    }
+
+    /**
+     * Given menu exists
+     * when delete meal
+     * then delete meal
+     */
+    @Test
+    public void whenDeletingMeal_thenMealIsDeleted() {
+        Menu menu = new Menu(1L, LocalDate.now(), MenuTime.LUNCH, 10, new Restaurant(1L, "Test Restaurant", "Test Location", 10, new ArrayList<>()), new ArrayList<>());
+
+        when(menuRepository.existsById(anyLong())).thenReturn(true);
+        when(mealRepository.existsByMenu_idAndId(anyLong(), anyLong())).thenReturn(true);
+        doNothing().when(mealRepository).deleteById(anyLong());
+        
+        assertDoesNotThrow(() -> menuService.deleteMeal(1L, 1L));
+    }
+
+    /**
+     * Given menu exists
+     * when delete unexistent meal
+     * then throw NoSuchElement
+     */
+    @Test
+    public void whenDeletingUnexistentMeal_thenThrowError() {
+        Menu menu = new Menu(1L, LocalDate.now(), MenuTime.LUNCH, 10, new Restaurant(1L, "Test Restaurant", "Test Location", 10, new ArrayList<>()), new ArrayList<>());
+
+        when(menuRepository.existsById(anyLong())).thenReturn(true);
+        when(mealRepository.existsByMenu_idAndId(anyLong(), anyLong())).thenReturn(false);
+
+        assertThrowsExactly(
+            NoSuchElementException.class,
+            () -> menuService.deleteMeal(1L, 1L),
+            "No error thrown when attempting to delete unexistent meal!"
+        );
     }
 }
-
