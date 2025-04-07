@@ -58,7 +58,7 @@ export default function Restaurants() {
   return (
     <div className={styles.container}>
       <h1>Restaurantes</h1>
-      <button onClick={() => openModal()}>Procurar uma reserva</button>
+      <button onClick={() => openModal()} id="search-reservations">Procurar uma reserva</button>
       <div className={styles.restaurants}>
         {restaurants.length > 0 ? (
           restaurants.map((restaurant) => (
@@ -95,6 +95,7 @@ export default function Restaurants() {
                   <h2>Procurar uma reserva</h2>
                   <div className={styles.modalInput}>
                     <input
+                      id="reservation-code"
                       type="text"
                       placeholder="Código da reserva"
                       value={reservationCode}
@@ -103,6 +104,7 @@ export default function Restaurants() {
                     {error && <span className={styles.error}>{error}</span>}
                     <div className={styles.modalButtons}>
                       <button
+                        id="search"
                         onClick={() => handleSubmit()}
                         className={
                           styles.confirmButton + " " + styles.bigButton
@@ -115,6 +117,7 @@ export default function Restaurants() {
                 </>
               )}
               <button
+                id="close"
                 onClick={() => closeModal()}
                 className={styles.bigButton}
               >

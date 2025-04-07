@@ -138,11 +138,11 @@ function ReservationDetails() {
           <div className={styles.reservationsList}>
             {reservations.map((reservation) => (
               <div key={reservation.code} className={styles.reservationItem}>
-                <div>Código: {reservation.code}</div>
-                <div>Status: {reservation.status}</div>
+                <div>Código: <span className={styles.reservationCode}>{reservation.code}</span></div>
+                <div>Status: <span className={styles.reservationStatus}>{reservation.status}</span></div>
                 <div className={styles.buttonsContainer}>
-                  <button className={styles.confirmButton + " " + styles.bigButton} onClick={() => handleCancel(reservation.code)}>Cancelar</button>
-                  <button className={styles.cancelButton + " " + styles.bigButton} onClick={() => handleCheckin(reservation.code)}>Check-in</button>
+                  <button className={styles.cancelButton + " " + styles.bigButton} onClick={() => handleCancel(reservation.code)}>Cancelar</button>
+                  <button className={styles.confirmButton + " " + styles.bigButton} onClick={() => handleCheckin(reservation.code)}>Check-in</button>
                 </div>
               </div>
             ))}

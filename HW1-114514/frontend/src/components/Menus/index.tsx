@@ -6,13 +6,7 @@ import { Restaurant } from "@Types/Restaurant";
 import { MenuRequestDTO } from "@Types/MenuRequestDTO";
 import { MenuTime } from "@Types/MenuTime";
 import { MealType } from "@Types/MealType";
-import {
-  Dispatch,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { useContext, useEffect, useState } from "react";
 import styles from "./styles.module.css";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
@@ -21,13 +15,13 @@ import { createReservation } from "@api/Reservation";
 import { ReservationRequestDTO } from "@Types/ReservationRequestDTO";
 import { useNavigate, useParams } from "react-router-dom";
 
-
 export default function Menus() {
   const navigate = useNavigate();
-  const { id: restaurantId } = useParams<{id: string}>();
+  const { id: restaurantId } = useParams<{ id: string }>();
   const { mode } = useContext(AppContext);
   const [restaurant, setRestaurant] = useState<Restaurant>();
   const [menus, setMenus] = useState<Menu[]>([]);
+  const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddMenu, setShowAddMenu] = useState(false);
@@ -40,7 +34,7 @@ export default function Menus() {
     options: [],
     time: MenuTime.LUNCH,
   });
-  
+
   const [mealOptions, setMealOptions] = useState<Array<MealDTO>>([
     {
       description: "sopa de pato",
@@ -60,8 +54,6 @@ export default function Menus() {
   ]);
 
   useEffect(() => {
-
-
     const fetchRestaurant = async () => {
       try {
         setLoading(true);
@@ -83,33 +75,35 @@ export default function Menus() {
     fetchRestaurant();
   }, []);
 
+  const fetchMenus = async (from?: Date, to?: Date) => {
+    try {
+      setLoading(true);
+      const response = await getRestaurantMenus(restaurant.id, from, to);
+      console.log(response);
+      if (response.status === 200) {
+        const updatedMenus = [...menus, ...response.data.menus];
+        setMenus(
+          [...new Set(updatedMenus)].sort((a, b) => {
+            if (a.date === b.date) {
+              return a.time === MenuTime.LUNCH ? -1 : 1;
+            }
+            return a.date < b.date ? -1 : 1;
+          })
+        );
+        setHasMore(response.data.hasMore);
+      } else {
+        setError("Não foi possível carregar as ementas.");
+      }
+    } catch (err) {
+      setError("Ocorreu um erro ao carregar as ementas.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (restaurant) {
-      const fetchMenus = async () => {
-        try {
-          setLoading(true);
-          const response = await getRestaurantMenus(restaurant.id);
-
-          if (response.status === 200) {
-            setMenus(
-              response.data.sort((a, b) => {
-                if (a.date === b.date) {
-                  return a.time === MenuTime.LUNCH ? -1 : 1;
-                }
-                return a.date < b.date ? -1 : 1;
-              })
-            );
-          } else {
-            setError("Não foi possível carregar as ementas.");
-          }
-        } catch (err) {
-          setError("Ocorreu um erro ao carregar as ementas.");
-          console.error(err);
-        } finally {
-          setLoading(false);
-        }
-      };
-
       fetchMenus();
     }
   }, [restaurant]);
@@ -138,7 +132,11 @@ export default function Menus() {
   const handleAddMenu = async () => {
     try {
       setLoading(true);
-      const menuRequest: MenuRequestDTO = { ...newMenu, options: mealOptions };
+      const menuRequest: MenuRequestDTO = {
+        ...newMenu,
+        options: mealOptions,
+        restaurantId: restaurant.id,
+      };
       const menuResponse = await createMenu(menuRequest);
       if (menuResponse.status === 201) {
         // Refresh menus after adding
@@ -209,7 +207,6 @@ export default function Menus() {
     setError("");
   };
 
-  
   if (loading) {
     return (
       <div className={styles.loading}>
@@ -217,7 +214,7 @@ export default function Menus() {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className={styles.emptyState}>
@@ -244,22 +241,24 @@ export default function Menus() {
       <div className={styles.header}>
         <div className={styles.restaurantInfo}>
           <h1 className={styles.restaurantName}>{restaurant.name}</h1>
-          <div className={styles.restaurantLocation}>
-            {restaurant.location}
-          </div>
+          <div className={styles.restaurantLocation}>{restaurant.location}</div>
         </div>
         {mode === "Worker" && (
           <div className={styles.buttonsContainer}>
             <button
               className={styles.addMenuButton}
               onClick={() => setShowAddMenu(true)}
+              id="add-menu"
             >
               Adicionar Menu
             </button>
             <button
-              style={{marginLeft: "10px"}}
+              style={{ marginLeft: "10px" }}
               className={styles.addMenuButton}
-              onClick={() => navigate(`/restaurant/${restaurantId}/reservations`)}
+              onClick={() =>
+                navigate(`/restaurant/${restaurantId}/reservations`)
+              }
+              id="view-reservations"
             >
               Ver Reservas
             </button>
@@ -274,6 +273,7 @@ export default function Menus() {
             <label>Data:</label>
             <input
               type="date"
+              id="set-date"
               value={newMenu.date.toISOString().split("T")[0]}
               onChange={(e) =>
                 setNewMenu({ ...newMenu, date: new Date(e.target.value) })
@@ -283,6 +283,7 @@ export default function Menus() {
           <div className={styles.formGroup}>
             <label>Horário:</label>
             <select
+              id="set-time"
               value={newMenu.time}
               onChange={(e) =>
                 setNewMenu({ ...newMenu, time: e.target.value as MenuTime })
@@ -336,12 +337,14 @@ export default function Menus() {
 
           <div className={styles.formActions}>
             <button
+              id="confirm-menu"
               onClick={handleAddMenu}
               className={styles.confirmButton + " " + styles.bigButton}
             >
               Confirmar
             </button>
             <button
+              id="cancel-menu"
               onClick={() => setShowAddMenu(false)}
               className={styles.cancelButton + " " + styles.bigButton}
             >
@@ -365,7 +368,7 @@ export default function Menus() {
             {menus.map((menu) => (
               <div key={menu.id} className={styles.menuCard}>
                 <div className={styles.menuHeader}>
-                  <div className={styles.menuDate}>{formatDate(menu.date)}</div>
+                  <div className={styles.menuDate} value={menu.date} time={menu.time}>{formatDate(menu.date)}</div>
                   <div className={styles.menuTime}>
                     {menu.time === MenuTime.LUNCH ? "Almoço" : "Jantar"}
                   </div>
@@ -396,16 +399,28 @@ export default function Menus() {
                     ))}
                   </div>
                 </div>
-                
-                    <button
-                      className={styles.addMealButton}
-                      onClick={() => reserveMeal(menu.options[0].id)}
-                    >
-                      Reservar refeição
-                    </button>
+
+                <button
+                  className={styles.addMealButton}
+                  onClick={() => reserveMeal(menu.options[0].id)}
+                >
+                  Reservar refeição
+                </button>
               </div>
             ))}
           </div>
+          {hasMore && (
+            <button
+              className={styles.loadMoreButton}
+              onClick={() => {
+                const date = new Date(menus[menus.length - 1].date);
+                date.setDate(date.getDate() + 1);
+                fetchMenus(date, undefined);
+              }}
+            >
+              Carregar mais
+            </button>
+          )}
         </div>
       )}
 

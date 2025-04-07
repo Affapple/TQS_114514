@@ -26,9 +26,9 @@ function UserReservation({ reservation, setReservation }: { reservation: Reserva
           </div>
           <div className={styles.detailRow}>
             <span className={styles.label}>Status:</span>
-            <span className={styles.value}>{reservation.status}</span>
+            <span className={styles.value} id="reservation-status">{reservation.status}</span>
           </div>
-          <button className={styles.cancelButton} onClick={handleCancelReservation}>Cancel Reservation</button>
+          <button id="cancel-reservation" className={styles.cancelButton} onClick={handleCancelReservation}>Cancel Reservation</button>
         </div>
 
         {message && <span className={styles.message}>{message}</span>}
