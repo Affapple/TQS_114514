@@ -138,8 +138,9 @@ public class RestaurantControllerTests {
             get("/api/v1/restaurants/1/menus?from=2025-04-01&to=2025-04-02")
         )
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$").isArray())
-        .andExpect(jsonPath("$", hasSize(2)));
+        .andExpect(jsonPath("$.menus").isArray())
+        .andExpect(jsonPath("$.menus", hasSize(2)))
+        .andExpect(jsonPath("$.hasMore").value(false));
     }
 
     /**
@@ -161,13 +162,13 @@ public class RestaurantControllerTests {
             get("/api/v1/restaurants/1/menus?from=2025-03-30&to=2025-04-01")
         )
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$").isArray())
-        .andExpect(jsonPath("$", hasSize(0)));
+        .andExpect(jsonPath("$.menus").isArray())
+        .andExpect(jsonPath("$.menus", hasSize(0)));
     }
 
     /**
      * Given restaurant "Castro" with id 1 exists 
-     *  and has 2 menus for the dates 2025-04-01 and 2025-04-02
+     *  and has 2 menus for the dates 2025-04-02 and 2025-04-03
      * when getMenusOfRestaurant is called with id 1, 2025-04-03 and 2025-04-04
      * then a list of <Menu2> is returned
      */
@@ -184,8 +185,8 @@ public class RestaurantControllerTests {
             get("/api/v1/restaurants/1/menus?from=2025-04-03&to=2025-04-04")
         )
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$").isArray())
-        .andExpect(jsonPath("$", hasSize(1)));
+        .andExpect(jsonPath("$.menus").isArray())
+        .andExpect(jsonPath("$.menus", hasSize(1)));
     }
 
     /**
@@ -206,10 +207,11 @@ public class RestaurantControllerTests {
 
         mvc.perform(
             get("/api/v1/restaurants/1/menus?to=2025-04-01")
-        )
+        ).andDo((r)-> System.out.println("Response: " + r.getResponse().getContentAsString()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$").isArray())
-        .andExpect(jsonPath("$", hasSize(1)));
+        .andExpect(jsonPath("$.menus").isArray())
+        .andExpect(jsonPath("$.menus", hasSize(1)))
+        .andExpect(jsonPath("$.hasMore").value(false));
     }
 
      /**
@@ -228,7 +230,8 @@ public class RestaurantControllerTests {
             get("/api/v1/restaurants/1/menus")
         )
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$").isArray())
-        .andExpect(jsonPath("$", hasSize(2)));
+        .andExpect(jsonPath("$.menus").isArray())
+        .andExpect(jsonPath("$.menus", hasSize(2)))
+        .andExpect(jsonPath("$.hasMore").value(false));
     }
 }

@@ -106,9 +106,13 @@ public class MenuService implements IMenuService {
         if (from == null) {
             from = LocalDate.now();
         }
-        if (to == null) {
-            to = LocalDate.now().plusDays(7);
+        if (from != null) {
+            to = from.plusDays(6);
+        } else {
+            to = LocalDate.now().plusDays(6);
         }
+
+        logger.info("Getting menus of restaurant {} from {} to {}", restaurantId, from, to);
 
         return menuRepository.findByRestaurant_idAndDateBetween(restaurantId, from, to);
     }
@@ -132,5 +136,9 @@ public class MenuService implements IMenuService {
         }
 
         mealRepository.deleteById(mealId);
+    }
+
+    public boolean hasMenusFrom(Long restaurantId, LocalDate date) {
+        return menuRepository.existsByRestaurant_idAndDateFrom(restaurantId, date);
     }
 }

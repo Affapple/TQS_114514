@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import tqs.homework.canteen.DTOs.MenuListResponseDTO;
 import tqs.homework.canteen.entities.Menu;
 import tqs.homework.canteen.entities.Restaurant;
 import tqs.homework.canteen.services.MenuService;
@@ -62,14 +63,25 @@ public class RestaurantController {
     }
 
     @GetMapping("/{restaurantId}/menus")
-    public ResponseEntity<List<Menu>> getMenusOfRestaurant(
+    public ResponseEntity<MenuListResponseDTO> getMenusOfRestaurant(
         @PathVariable Long restaurantId,
         @RequestParam(required = false) LocalDate from,
         @RequestParam(required = false) LocalDate to
     ) {
-        logger.info("Received request to get menus of restaurant: {}", restaurantId);
+        logger.info("Received request to get menus of restaurant: {} from {} to {}", restaurantId, from, to);
+        
         List<Menu> menus = menuService.getMenusOfRestaurantBetweenDates(restaurantId, from, to);
         logger.info("Found {} menus", menus.size());
-        return new ResponseEntity<>(menus, HttpStatus.OK);
+        
+        boolean hasMore = false;
+        if (to == null && menus.size() > 0) {
+            to = menus.getLast().getDate();
+            hasMore = menuService.hasMenusFrom(restaurantId, to.plusDays(1));
+        }
+
+        return new ResponseEntity<>(new MenuListResponseDTO(
+            menus,
+            hasMore
+        ), HttpStatus.OK);
     }
 }

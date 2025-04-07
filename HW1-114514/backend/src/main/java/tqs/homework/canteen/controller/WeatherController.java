@@ -44,14 +44,9 @@ public class WeatherController {
     public ResponseEntity<CacheStats> getCacheStats() {
         logger.info("Received request for weather cache statistics");
         
-        try {
-            CacheStats stats = weatherService.getCacheStats();
-            logger.info("Successfully retrieved cache statistics: hits={}, misses={}, total calls={}", 
-                stats.getCacheHits(), stats.getCacheMisses(), stats.getTotalCalls());
-            return ResponseEntity.ok(stats);
-        } catch (Exception e) {
-            logger.error("Error retrieving cache statistics: {}", e.getMessage(), e);
-            throw e;
-        }
+        CacheStats stats = weatherService.getCacheStats();
+        logger.info("Successfully retrieved cache statistics: hits={}, misses={}, total calls={}",
+            stats.getCacheHits(), stats.getCacheMisses(), stats.getTotalCalls());
+        return ResponseEntity.ok(stats);
     }
 }

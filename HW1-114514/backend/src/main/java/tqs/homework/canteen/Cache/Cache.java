@@ -14,7 +14,7 @@ import lombok.Setter;
 public class Cache<T> {
     @Setter
     @Getter
-    @Value("${cache.ttl: #3600000}}")
+    @Value("${cache.ttl: #{3600000}}")
     private Long ttl;
     private HashMap<String, CacheEntry<T>> cache = new HashMap<>();
 

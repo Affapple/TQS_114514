@@ -38,4 +38,14 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
         )
     """)
     public boolean existsMealOfThisType(Long restaurantId, LocalDate date, MenuTime time);
+
+    @Query("""
+        SELECT EXISTS (
+            SELECT 1
+            FROM Menu as m
+            WHERE m.restaurant.id = :restaurantId 
+            AND   m.date >= :date
+        )
+    """)
+    public boolean existsByRestaurant_idAndDateFrom(Long restaurantId, LocalDate date);
 }

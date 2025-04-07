@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import tqs.homework.canteen.EnumTypes.MenuTime;
-import tqs.homework.canteen.EnumTypes.MenuTimeConverter;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,6 +19,5 @@ public class MenuDTO {
     Long restaurantId;
     List<MealDTO> options;
     LocalDate date;
-    @Convert(converter = MenuTimeConverter.class)
     MenuTime time;
 }

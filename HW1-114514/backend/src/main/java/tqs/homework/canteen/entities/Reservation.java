@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import tqs.homework.canteen.EnumTypes.ReservationStatus;
-import tqs.homework.canteen.EnumTypes.ReservationStatusConverter;
 @Entity
 @NoArgsConstructor
 @Getter
@@ -19,7 +18,6 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "reservation_status")
-    @Convert(converter = ReservationStatusConverter.class)
     private ReservationStatus status;
 
     @ManyToOne

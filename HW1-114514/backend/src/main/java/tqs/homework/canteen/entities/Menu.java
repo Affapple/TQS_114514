@@ -11,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import tqs.homework.canteen.EnumTypes.MenuTime;
-import tqs.homework.canteen.EnumTypes.MenuTimeConverter;
 
 @Entity
 @Getter
@@ -31,7 +30,6 @@ public class Menu {
     
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "menu_time")
-    @Convert(converter = MenuTimeConverter.class)
     private MenuTime time;
     
     private Integer capacity;

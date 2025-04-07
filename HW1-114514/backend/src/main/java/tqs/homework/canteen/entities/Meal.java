@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import tqs.homework.canteen.EnumTypes.MealType;
-import tqs.homework.canteen.EnumTypes.MealTypeConverter;
 
 @Entity
 @NoArgsConstructor
@@ -27,7 +26,6 @@ public class Meal {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "meal_type")
-    @Convert(converter = MealTypeConverter.class)
     private MealType type;
 
     @ManyToOne

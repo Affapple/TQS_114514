@@ -1,7 +1,7 @@
 package tqs.homework.canteen.Unit_RepositoryTests;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.iterableWithSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -103,6 +103,30 @@ class RepositoryTests {
         assertThat(
             menuRepository.findByRestaurant_idAndDateBetween(res.getId(), today, tomorrow),
             iterableWithSize(2)
+        );
+    }
+
+    @Test
+    public void whenCheckIfMenusExistAfterDate_thenReturnTrue() {
+        Restaurant res = restaurantRepository.findAll().getFirst();
+
+        
+        assertThat(
+            menuRepository
+                 .existsByRestaurant_idAndDateFrom(
+                    res.getId(),
+                    LocalDate.now()
+                ),
+            is(true)
+        );
+
+        assertThat(
+            menuRepository
+                 .existsByRestaurant_idAndDateFrom(
+                    res.getId(),
+                    LocalDate.now().plusDays(1)
+                ),
+            is(false)
         );
     }
 
