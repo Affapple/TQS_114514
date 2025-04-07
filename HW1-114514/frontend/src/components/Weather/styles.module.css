@@ -1,4 +1,6 @@
 .mainContent {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   border-radius: 12px;
   background: linear-gradient(to right, #f6f9fc, #eef2f7);
@@ -9,6 +11,7 @@
 .weatherBanner {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   scrollbar-width: thin;
   scrollbar-color: #888 #f1f1f1;
 }
@@ -28,12 +31,12 @@
 }
 
 .weatherCard {
-  width: 100px;
   background: white;
   padding: 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .date {
@@ -120,3 +123,20 @@
   font-weight: bold;
   margin-bottom: 10px;
 }
+
+
+/* STATS */
+
+.statsRow {
+  display: flex;
+}
+
+.statsItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  font-size: 0.8rem;
+  padding: 3px;
+}
+

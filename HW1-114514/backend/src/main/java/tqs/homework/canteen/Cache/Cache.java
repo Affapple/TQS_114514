@@ -2,8 +2,6 @@ package tqs.homework.canteen.Cache;
 
 import java.util.HashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -38,6 +36,7 @@ public class Cache<T> {
             cacheMisses++;
             return null;
         }
+        
         cacheHits++;
         return entry.getValue();
     }

@@ -28,7 +28,7 @@ public class WeatherController {
     @GetMapping("/forecast")
     public ResponseEntity<List<Forecast>> getWeather() {
         LocalDate from = LocalDate.now();
-        LocalDate to = LocalDate.now().plusDays(7);
+        LocalDate to = LocalDate.now().plusDays(6);
         logger.info("Fetching weather forecast from {} to {}", from, to);
         
         try {
