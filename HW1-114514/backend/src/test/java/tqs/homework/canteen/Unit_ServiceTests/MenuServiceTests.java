@@ -501,5 +501,41 @@ class MenuServiceTests {
             hasSize(1)
         );
     }
+
+
+    /**
+     * Given menu dont exists
+     * when add multiple meals
+     * then throw NoSuchElement
+     */
+    @Test
+    public void whenAddingMultipleMealsToNonExistentMenu_thenThrowError() {
+        when(menuRepository.existsById(anyLong())).thenReturn(false);
+
+        assertThrowsExactly(
+            NoSuchElementException.class,
+            () -> menuService.addMeal(new MealDTO(1L, "Meal 1", MealType.MEAT)),
+            "No error thrown when attempting to add multiple meals to non-existent menu!"
+        );
+    }
+    /**
+     * Given menu exists
+     * when add multiple meals
+     * then add all meals
+     */
+    @Test
+    public void whenAddingMultipleMeals_thenAllMealsAreAdded() {
+        Menu menu = new Menu(1L, LocalDate.now(), MenuTime.LUNCH, 10, new Restaurant(1L, "Test Restaurant", "Test Location", 10, new ArrayList<>()), new ArrayList<>());
+        
+        when(menuRepository.existsById(anyLong())).thenReturn(true);
+        when(menuRepository.findById(anyLong())).thenReturn(Optional.of(menu));
+        when(menuRepository.save(Mockito.any(Menu.class))).thenReturn(menu);
+        when(mealRepository.save(Mockito.any(Meal.class))).thenReturn(new Meal("Meal 1", MealType.MEAT, menu));
+
+        menuService.addMeal(new MealDTO(1L, "Meal 1", MealType.MEAT));
+        menuService.addMeal(new MealDTO(1L, "Meal 2", MealType.FISH));
+        
+        
+    }
 }
 
