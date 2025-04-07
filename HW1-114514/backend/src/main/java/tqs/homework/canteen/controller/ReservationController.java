@@ -3,6 +3,8 @@ package tqs.homework.canteen.controller;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +28,7 @@ import tqs.homework.canteen.services.ReservationService;
 @RequestMapping("/api/v1/reservations")
 @CrossOrigin(origins = "*")
 public class ReservationController {
-
+    private static final Logger logger = LoggerFactory.getLogger(ReservationController.class);
     @Autowired
     private ReservationService reservationService;
 
@@ -36,8 +38,11 @@ public class ReservationController {
         @RequestParam(required = false) LocalDate date,
         @RequestParam(required = false) MenuTime time
     ) {
+        logger.info("Received request to get all reservations for restaurantId={}, date={}, time={}", restaurantId, date, time);
+        List<Reservation> reservations = reservationService.getAllReservations(restaurantId, date, time);
+        logger.info("Found {} reservations", reservations.size());
         return new ResponseEntity<>(
-            reservationService.getAllReservations(restaurantId, date, time),
+            reservations,
             HttpStatus.OK
         );
     }
@@ -46,8 +51,11 @@ public class ReservationController {
     public ResponseEntity<Reservation> createReservation(
         @RequestBody ReservationRequestDTO reservationRequestDTO
     ) {
+        logger.info("Received request to create reservation: {}", reservationRequestDTO);
+        Reservation reservation = reservationService.createReservation(reservationRequestDTO);
+        logger.info("Reservation created successfully: {}", reservation);
         return new ResponseEntity<>(
-            reservationService.createReservation(reservationRequestDTO),
+            reservation,
             HttpStatus.CREATED
         );
     }
@@ -57,8 +65,11 @@ public class ReservationController {
     public ResponseEntity<Reservation> getReservation(
         @PathVariable String reservationId
     ) {
+        logger.info("Received request to get reservation: {}", reservationId);
+        Reservation reservation = reservationService.getReservationByCode(reservationId);
+        logger.info("Reservation found: {}", reservation);
         return new ResponseEntity<>(
-            reservationService.getReservationByCode(reservationId),
+            reservation,
             HttpStatus.OK
         );
     }
@@ -67,8 +78,11 @@ public class ReservationController {
     public ResponseEntity<Reservation> cancelReservation(
         @PathVariable String reservationId
     ) {
+        logger.info("Received request to cancel reservation: {}", reservationId);
+        Reservation reservation = reservationService.cancelReservation(reservationId);
+        logger.info("Reservation cancelled successfully: {}", reservation);
         return new ResponseEntity<>(
-            reservationService.cancelReservation(reservationId),
+            reservation,
             HttpStatus.OK
         );
     }
@@ -77,8 +91,12 @@ public class ReservationController {
     public ResponseEntity<Reservation> checkinReservation(
         @PathVariable String reservationId
     ) {
+        logger.info("Received request to checkin reservation: {}", reservationId);
+        Reservation reservation = reservationService.checkInReservation(reservationId);
+        
+        logger.info("Reservation checkedin successfully: {}", reservation);
         return new ResponseEntity<>(
-            reservationService.checkInReservation(reservationId),
+            reservation,
             HttpStatus.OK
         );
     }

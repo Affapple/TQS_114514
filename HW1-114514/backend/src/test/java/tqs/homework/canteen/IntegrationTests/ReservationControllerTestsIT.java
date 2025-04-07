@@ -247,7 +247,7 @@ public class ReservationControllerTestsIT {
             .delete("/api/v1/reservations/" + validReservation.getCode())
         .then()
             .statusCode(200)
-            .body("status", is("cancelled"));
+            .body("status", is("CANCELLED"));
     }
 
     /**
@@ -308,7 +308,7 @@ public class ReservationControllerTestsIT {
             .put("/api/v1/reservations/" + validReservation.getCode())
         .then()
             .statusCode(200)
-            .body("status", is("used"));
+            .body("status", is("USED"));
     }
 
     /**

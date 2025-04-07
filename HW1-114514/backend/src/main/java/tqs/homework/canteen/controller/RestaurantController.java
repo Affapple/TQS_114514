@@ -3,6 +3,8 @@ package tqs.homework.canteen.controller;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,8 @@ import tqs.homework.canteen.services.RestaurantService;
 @RequestMapping("/api/v1/restaurants")
 @CrossOrigin(origins = "*")
 public class RestaurantController {
+    private static final Logger logger = LoggerFactory.getLogger(RestaurantController.class);
+
     @Autowired
     private RestaurantService restaurantService;
     @Autowired
@@ -31,21 +35,30 @@ public class RestaurantController {
 
     @GetMapping
     public ResponseEntity<List<Restaurant>> getAllRestaurants() {
-        return new ResponseEntity<>(restaurantService.getAllRestaurants(), HttpStatus.OK);
+        logger.info("Received request to get all restaurants");
+        List<Restaurant> restaurants = restaurantService.getAllRestaurants();
+        logger.info("Found {} restaurants", restaurants.size());
+        return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<Restaurant> createRestaurant(
         @RequestBody Restaurant restaurant
     ) {
-        return new ResponseEntity<>(restaurantService.saveNewRestaurant(restaurant), HttpStatus.CREATED);
+        logger.info("Received request to create restaurant: {}", restaurant);
+        Restaurant savedRestaurant = restaurantService.saveNewRestaurant(restaurant);
+        logger.info("Restaurant created successfully: {}", savedRestaurant);
+        return new ResponseEntity<>(savedRestaurant, HttpStatus.CREATED);
     }
 
     @GetMapping("/{restaurantId}")
     public ResponseEntity<Restaurant> getRestaurant(
         @PathVariable Long restaurantId
     ) {
-        return new ResponseEntity<>(restaurantService.getRestaurantById(restaurantId), HttpStatus.OK);
+        logger.info("Received request to get restaurant: {}", restaurantId);
+        Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
+        logger.info("Restaurant found: {}", restaurant);
+        return new ResponseEntity<>(restaurant, HttpStatus.OK);
     }
 
     @GetMapping("/{restaurantId}/menus")
@@ -54,6 +67,9 @@ public class RestaurantController {
         @RequestParam(required = false) LocalDate from,
         @RequestParam(required = false) LocalDate to
     ) {
-        return new ResponseEntity<>(menuService.getMenusOfRestaurantBetweenDates(restaurantId, from, to), HttpStatus.OK);
+        logger.info("Received request to get menus of restaurant: {}", restaurantId);
+        List<Menu> menus = menuService.getMenusOfRestaurantBetweenDates(restaurantId, from, to);
+        logger.info("Found {} menus", menus.size());
+        return new ResponseEntity<>(menus, HttpStatus.OK);
     }
 }

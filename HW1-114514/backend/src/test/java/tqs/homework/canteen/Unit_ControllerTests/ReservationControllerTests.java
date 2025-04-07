@@ -146,7 +146,7 @@ public class ReservationControllerTests {
 
         mvc.perform(delete("/api/v1/reservations/validCode"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status").value("cancelled"));
+            .andExpect(jsonPath("$.status").value("CANCELLED"));
     }
 
     /**
@@ -203,7 +203,7 @@ public class ReservationControllerTests {
 
         mvc.perform(put("/api/v1/reservations/validCode"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status").value("used"));
+            .andExpect(jsonPath("$.status").value("USED"));
     }
 
     /**

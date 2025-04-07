@@ -52,7 +52,7 @@ public class RestaurantControllerTests {
             )
         );
 
-        mvc.perform(get("/api/v1/restaurant"))
+        mvc.perform(get("/api/v1/restaurants"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").isArray())
             .andExpect(jsonPath("$", hasSize(3)));
@@ -68,7 +68,7 @@ public class RestaurantControllerTests {
     public void whenGetAllRestaurants_thenEmptyListIsReturned() throws Exception {
         when(restaurantService.getAllRestaurants()).thenReturn(List.of());
 
-        mvc.perform(get("/api/v1/restaurant"))
+        mvc.perform(get("/api/v1/restaurants"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").isArray())
             .andExpect(jsonPath("$", hasSize(0)));
@@ -85,14 +85,14 @@ public class RestaurantControllerTests {
         when(restaurantService.saveNewRestaurant(Mockito.any(Restaurant.class)))
             .thenReturn(new Restaurant());
 
-        mvc.perform(post("/api/v1/restaurant")
+        mvc.perform(post("/api/v1/restaurants")
             .contentType(MediaType.APPLICATION_JSON)
             .content(JsonUtils.toJson(new Restaurant("Castro", "Castro", 10)))
         )
         .andExpect(status().isCreated());
     }
 
-    /* GET: /api/v1/restaurant/{restaurant_id} */
+    /* GET: /api/v1/restaurants/{restaurant_id} */
     /**
      * Given restaurant "Castro" with id 1 exists
      * when getRestaurant is called with id 1
@@ -109,7 +109,7 @@ public class RestaurantControllerTests {
         when(restaurantService.getRestaurantById(1L)).thenReturn(restaurant);
 
         mvc.perform(
-            get("/api/v1/restaurant/1")
+            get("/api/v1/restaurants/1")
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(1L))
@@ -118,7 +118,7 @@ public class RestaurantControllerTests {
         .andExpect(jsonPath("$.capacity").value(10));
     }
 
-    /* GET: /api/v1/restaurant/{restaurant_id}/menus */
+    /* GET: /api/v1/restaurants/{restaurant_id}/menus */
     /**
      * Given restaurant "Castro" with id 1 exists 
      *  and has 2 menus for the dates 2025-04-01 and 2025-04-02
@@ -135,7 +135,7 @@ public class RestaurantControllerTests {
         ).thenReturn(List.of(new Menu(), new Menu()));
 
         mvc.perform(
-            get("/api/v1/restaurant/1/menus?from=2025-04-01&to=2025-04-02")
+            get("/api/v1/restaurants/1/menus?from=2025-04-01&to=2025-04-02")
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isArray())
@@ -158,7 +158,7 @@ public class RestaurantControllerTests {
         ).thenReturn(List.of());
 
         mvc.perform(
-            get("/api/v1/restaurant/1/menus?from=2025-03-30&to=2025-04-01")
+            get("/api/v1/restaurants/1/menus?from=2025-03-30&to=2025-04-01")
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isArray())
@@ -181,7 +181,7 @@ public class RestaurantControllerTests {
         ).thenReturn(List.of(new Menu()));
 
         mvc.perform(
-            get("/api/v1/restaurant/1/menus?from=2025-04-03&to=2025-04-04")
+            get("/api/v1/restaurants/1/menus?from=2025-04-03&to=2025-04-04")
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isArray())
@@ -205,7 +205,7 @@ public class RestaurantControllerTests {
         ).thenReturn(List.of(new Menu()));
 
         mvc.perform(
-            get("/api/v1/restaurant/1/menus?to=2025-04-01")
+            get("/api/v1/restaurants/1/menus?to=2025-04-01")
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isArray())
@@ -225,7 +225,7 @@ public class RestaurantControllerTests {
         ).thenReturn(List.of(new Menu(), new Menu()));
 
         mvc.perform(
-            get("/api/v1/restaurant/1/menus")
+            get("/api/v1/restaurants/1/menus")
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isArray())

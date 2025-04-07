@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tqs.homework.canteen.DTOs.MealDTO;
@@ -17,6 +19,7 @@ import tqs.homework.canteen.repositories.RestaurantRepository;
 
 @Service
 public class MenuService implements IMenuService {
+    private static final Logger logger = LoggerFactory.getLogger(MenuService.class);
     @Autowired
     private RestaurantRepository restaurantRepository;
     @Autowired
@@ -35,6 +38,7 @@ public class MenuService implements IMenuService {
             throw new IllegalArgumentException("Meal of type \"" + meal.getType() + "\" already exists in menu with id \"" + meal.getMenuId() + "\"!");
         }
 
+        logger.info("Adding meal to menu: {}", meal);
         Meal newMeal = mealRepository.save(new Meal(meal.getDescription(), meal.getType(), menu));
         options.add(newMeal);
         menu.setOptions(options);
@@ -52,7 +56,9 @@ public class MenuService implements IMenuService {
             try {
                 addMeal(meal);
             } catch (IllegalArgumentException e) 
-            {/*Ignore meals that already exist in the menu*/}
+            {
+                logger.error("Error adding meal to menu: {}", e.getMessage(), e);
+            }
         }
         return menuRepository.findById(menuId).get();
     }
@@ -67,18 +73,19 @@ public class MenuService implements IMenuService {
             throw new IllegalArgumentException("Menu with date \"" + menuRequest.getDate() + "\" and time \"" + menuRequest.getTime().getName() + "\" already exists in restaurant with id \"" + menuRequest.getRestaurantId() + "\"!");
         }
 
+        logger.info("Creating new menu: {}", menuRequest);
         Menu menu = menuRepository.save(
             new Menu(menuRequest.getDate(), menuRequest.getTime(), restaurant)
         );
 
-        addMeals(menu.getId(), menuRequest.getOptions());
-        return menu;
+        return addMeals(menu.getId(), menuRequest.getOptions());
     }
 
     @Override
     public List<Meal> getMeals(Long menuId) {
         Menu menu = menuRepository.findById(menuId)
             .orElseThrow(() -> new NoSuchElementException("Menu with id \"" + menuId + "\" not found!"));
+
         return menu.getOptions();
     }
 

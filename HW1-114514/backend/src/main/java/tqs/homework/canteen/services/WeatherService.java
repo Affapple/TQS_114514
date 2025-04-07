@@ -109,7 +109,7 @@ public class WeatherService implements IWeatherService {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error fetching weather data: " + e.getMessage());
+            logger.error("Error fetching weather data: {}", e.getMessage());
         }
         return result;
     }

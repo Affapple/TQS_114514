@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tqs.homework.canteen.DTOs.ReservationRequestDTO;
@@ -19,6 +21,8 @@ import tqs.homework.canteen.repositories.RestaurantRepository;
 
 @Service
 public class ReservationService implements IReservationService {
+    private static final Logger logger = LoggerFactory.getLogger(ReservationService.class);
+
     @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
@@ -49,10 +53,7 @@ public class ReservationService implements IReservationService {
         reservation.setStatus(ReservationStatus.ACTIVE);
         reservation.generateCode();
 
-        Reservation savedReservation = reservationRepository.save(reservation);
-        //log.info("Created new reservation with code: {}", savedReservation.getCode());
-
-        return savedReservation;
+        return reservationRepository.save(reservation);
     }
 
     public Reservation getReservationByCode(String code) {
@@ -81,10 +82,7 @@ public class ReservationService implements IReservationService {
         menuRepository.save(menu);
 
         reservation.setStatus(ReservationStatus.CANCELLED);
-        Reservation updatedReservation = reservationRepository.save(reservation);
-        // log.info("Canceled reservation with code: {}", code);
-
-        return updatedReservation;
+        return reservationRepository.save(reservation);
     }
 
     public Reservation checkInReservation(String code) {
@@ -99,10 +97,7 @@ public class ReservationService implements IReservationService {
         }
 
         reservation.setStatus(ReservationStatus.USED);
-        Reservation updatedReservation = reservationRepository.save(reservation);
-        //log.info("Checked in reservation with code: {}", code);
-
-        return updatedReservation;
+        return reservationRepository.save(reservation);
     }
 
     @Override

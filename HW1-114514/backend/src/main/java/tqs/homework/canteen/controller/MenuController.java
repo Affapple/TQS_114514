@@ -34,7 +34,8 @@ public class MenuController {
     ) {
         logger.info("Received menu request: {}", menuRequest);
         Menu menu = menuService.createNewMenu(menuRequest);
-        
+
+        logger.info("Menu created: {}", menu);
         return new ResponseEntity<>(
             menu,
             HttpStatus.CREATED
@@ -45,15 +46,22 @@ public class MenuController {
     public ResponseEntity<Menu> addMealToMenu(
         @RequestBody MealDTO meal
     ) {
+        logger.info("Received add meal to menu request: {}", meal);
+        Menu menu = menuService.addMeal(meal);
+
+        logger.info("Menu added successfully: {}", menu);
         return new ResponseEntity<>(
-            menuService.addMeal(meal),
+            menu,
             HttpStatus.CREATED
         );
     }
 
     @DeleteMapping("/{menuId}")
     public ResponseEntity<Void> deleteMenu(@PathVariable Long menuId) {
+        logger.info("Received delete menu request: menuId={}", menuId);
         menuService.deleteMenu(menuId);
+
+        logger.info("Menu deleted successfully");
         return new ResponseEntity<>(
             HttpStatus.OK
         );
@@ -64,7 +72,10 @@ public class MenuController {
         @PathVariable Long menuId, 
         @PathVariable Long mealId
     ) {
+        logger.info("Received delete meal from menu request: menuId={}, mealId={}", menuId, mealId);
         menuService.deleteMeal(menuId, mealId);
+
+        logger.info("Meal deleted successfully");
         return new ResponseEntity<>(
             HttpStatus.OK
         );
