@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WeatherService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">canteen</a> &gt; <a href="index.source.html" class="el_package">tqs.homework.canteen.services</a> &gt; <span class="el_source">WeatherService.java</span></div><h1>WeatherService.java</h1><pre class="source lang-java linenums">package tqs.homework.canteen.services;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import tqs.homework.canteen.Cache.Cache;
+import tqs.homework.canteen.DTOs.CacheStats;
+import tqs.homework.canteen.DTOs.Forecast;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.List;
+
+@Service
+<span class="fc" id="L26">public class WeatherService implements IWeatherService {</span>
+<span class="fc" id="L27">    private static final Logger logger = LoggerFactory.getLogger(WeatherService.class);</span>
+
+    @Value(&quot;${weatherapi.key}&quot;)
+    private String apiKey;
+<span class="fc" id="L31">    private final String BASE_URL = &quot;http://api.weatherapi.com/v1&quot;;</span>
+<span class="fc" id="L32">    private final RestTemplate restTemplate = new RestTemplate();</span>
+
+    @Autowired
+    private Cache&lt;Forecast&gt; cache;
+<span class="fc" id="L36">    private Long totalCalls = 0L;</span>
+
+    @Override
+    public List&lt;Forecast&gt; getWeather(LocalDate from, LocalDate to) {
+<span class="fc" id="L40">        totalCalls++;</span>
+<span class="fc" id="L41">        List&lt;Forecast&gt; result = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L42">        LocalDate startFetch = null;</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        for (LocalDate date = from; !date.isAfter(to); date = date.plusDays(1)) {</span>
+<span class="fc" id="L44">            Forecast forecast = cache.get(date.toString());</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">            if (forecast == null) {</span>
+<span class="fc" id="L46">                startFetch = date; </span>
+<span class="fc" id="L47">                break;</span>
+            }
+<span class="fc" id="L49">            result.add(forecast);</span>
+        }
+<span class="fc" id="L51">        logger.info(&quot;Fetched {} forecasts from cache, from {} to {}&quot;, result.size(), from, to);</span>
+
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        if (startFetch != null) {</span>
+<span class="fc" id="L54">            logger.info(&quot;Fetching weather forecast to the api from {} to {}&quot;, startFetch, to);</span>
+<span class="fc" id="L55">            List&lt;Forecast&gt; newForecasts = fetchWeatherFromApi(startFetch, to);</span>
+<span class="fc" id="L56">            logger.info(&quot;Fetched {} forecasts from the api&quot;, newForecasts.size());</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">            for (Forecast forecast : newForecasts) {</span>
+<span class="fc" id="L58">                cache.put(forecast.getDate().toString(), forecast);</span>
+<span class="fc" id="L59">            }</span>
+<span class="fc" id="L60">            result.addAll(newForecasts);</span>
+        }
+<span class="fc" id="L62">        return result;</span>
+    }
+
+    private List&lt;Forecast&gt; fetchWeatherFromApi(LocalDate from, LocalDate to) {
+<span class="fc" id="L66">        String url = UriComponentsBuilder.fromUriString(BASE_URL + &quot;/forecast.json&quot;)</span>
+<span class="fc" id="L67">                .queryParam(&quot;key&quot;, apiKey)</span>
+<span class="fc" id="L68">                .queryParam(&quot;q&quot;, &quot;Aveiro&quot;)</span>
+<span class="fc" id="L69">                .queryParam(&quot;days&quot;, to.getDayOfMonth() - from.getDayOfMonth() + 1)</span>
+<span class="fc" id="L70">                .queryParam(&quot;aqi&quot;, &quot;no&quot;)</span>
+<span class="fc" id="L71">                .build()</span>
+<span class="fc" id="L72">                .toUriString();</span>
+
+<span class="fc" id="L74">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L75">        headers.setContentType(MediaType.APPLICATION_JSON);</span>
+
+<span class="fc" id="L77">        HttpEntity&lt;?&gt; entity = new HttpEntity&lt;&gt;(headers);</span>
+
+<span class="fc" id="L79">        List&lt;Forecast&gt; result = new ArrayList&lt;&gt;();</span>
+        try {
+<span class="fc" id="L81">            ResponseEntity&lt;Map&gt; response = restTemplate.exchange(</span>
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    Map.class);
+
+<span class="pc bpc" id="L87" title="2 of 4 branches missed.">            if (response.getStatusCode().is2xxSuccessful() &amp;&amp; response.getBody() != null) {</span>
+<span class="fc" id="L88">                Map&lt;String, Object&gt; responseBody = response.getBody();</span>
+<span class="fc" id="L89">                Map&lt;String, Object&gt; forecast = (Map&lt;String, Object&gt;) responseBody.get(&quot;forecast&quot;);</span>
+<span class="fc" id="L90">                List&lt;Map&lt;String, Object&gt;&gt; forecastDays = (List&lt;Map&lt;String, Object&gt;&gt;) forecast.get(&quot;forecastday&quot;);</span>
+
+<span class="pc bpc" id="L92" title="2 of 4 branches missed.">                if (forecastDays != null &amp;&amp; !forecastDays.isEmpty()) {</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">                    for (Map&lt;String, Object&gt; dayComplete : forecastDays) {</span>
+<span class="fc" id="L94">                        String date = (String) dayComplete.get(&quot;date&quot;);</span>
+
+<span class="fc" id="L96">                        Map&lt;String, Object&gt; day = (Map&lt;String, Object&gt;) dayComplete.get(&quot;day&quot;);</span>
+<span class="fc" id="L97">                        Map&lt;String, Object&gt; condition = (Map&lt;String, Object&gt;) day.get(&quot;condition&quot;);</span>
+
+<span class="fc" id="L99">                        Forecast forecastDTO = new Forecast(</span>
+<span class="fc" id="L100">                                LocalDate.parse(date),</span>
+<span class="fc" id="L101">                                (double) day.get(&quot;maxtemp_c&quot;),</span>
+<span class="fc" id="L102">                                (double) day.get(&quot;mintemp_c&quot;),</span>
+<span class="fc" id="L103">                                (int) day.get(&quot;avghumidity&quot;),</span>
+<span class="fc" id="L104">                                (String) condition.get(&quot;text&quot;),</span>
+<span class="fc" id="L105">                                (String) condition.get(&quot;icon&quot;));</span>
+
+<span class="fc" id="L107">                        result.add(forecastDTO);</span>
+<span class="fc" id="L108">                    }</span>
+                }
+            }
+<span class="fc" id="L111">        } catch (Exception e) {</span>
+<span class="fc" id="L112">            logger.error(&quot;Error fetching weather data: {}&quot;, e.getMessage());</span>
+<span class="fc" id="L113">        }</span>
+<span class="fc" id="L114">        return result;</span>
+    }
+
+    public CacheStats getCacheStats() {
+<span class="fc" id="L118">        return new CacheStats(cache.getCacheHits(), cache.getCacheMisses(), totalCalls);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
