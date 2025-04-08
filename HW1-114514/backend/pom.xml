@@ -16,7 +16,9 @@
 	<description>Canteen Facilities - TQS</description>
 
 	<properties>
-		<java.version>21</java.version>
+    <java.version>21</java.version>
+    <sonar.organization>affapple</sonar.organization>
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
 	<dependencies>
@@ -117,11 +119,11 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-      <groupId>io.github.bonigarcia</groupId>
-      <artifactId>selenium-jupiter</artifactId>
-      <version>5.1.1</version>
-      <scope>test</scope>
-    </dependency>
+			<groupId>io.github.bonigarcia</groupId>
+			<artifactId>selenium-jupiter</artifactId>
+			<version>5.1.1</version>
+			<scope>test</scope>
+		</dependency>
 		<!--END
 		FRONTEND TESTING-->
 
@@ -139,21 +141,24 @@
 		<!--END
 		TESTING PACKAGES-->
 
-    <!--STATIC CODE ANALYSIS-->
-    <dependency>
-      <groupId>org.sonarsource.scanner.maven</groupId>
-      <artifactId>sonar-maven-plugin</artifactId>
-      <version>5.1.0.4751</version>
-    </dependency>
-    <!--END STATIC CODE ANALYSIS-->
+		<!--STATIC
+		CODE ANALYSIS-->
+		<dependency>
+			<groupId>org.sonarsource.scanner.maven</groupId>
+			<artifactId>sonar-maven-plugin</artifactId>
+			<version>5.1.0.4751</version>
+		</dependency>
+		<!--END
+		STATIC CODE ANALYSIS-->
 
-    <!--OPENAPI/SWAGGER-->
-    <dependency>
-        <groupId>org.springdoc</groupId>
-        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        <version>2.3.0</version>
-    </dependency>
-    <!--END OPENAPI/SWAGGER-->
+		<!--OPENAPI/SWAGGER-->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.3.0</version>
+		</dependency>
+		<!--END
+		OPENAPI/SWAGGER-->
 
 	</dependencies>
 
@@ -184,28 +189,27 @@
 				</configuration>
 			</plugin>
 			<!-- JACOCO TEST COVERAGE -->
-      <plugin>
-        <groupId>org.jacoco</groupId>
-       <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.12</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.12</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
 
-          <execution>
-            <id>report</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- END JACOCO TEST COVERAGE -->
+					<execution>
+						<id>report</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- END JACOCO TEST COVERAGE -->
 		</plugins>
 	</build>
-
 </project>

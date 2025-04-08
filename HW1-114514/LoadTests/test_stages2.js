@@ -16,14 +16,6 @@ export const options = {
     http_req_failed: ["rate<0.01"], // http errors should be less than 1%
     http_req_duration: ["p(95)<1100"], // 95% of requests should be below 1100ms
     checks: ["rate>0.98"], // 98% dos checks têm de passar
-  },
-  // Add prometheus configuration
-  ext: {
-    loadimpact: {
-      distribution: {
-        'prometheus': { percent: 100 }
-      }
-    }
   }
 };
 
