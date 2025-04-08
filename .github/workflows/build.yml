@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: HW1-114514/backed
+        working-directory: HW1-114514/backend
     steps:
       - uses: actions/checkout@v4
         with:
