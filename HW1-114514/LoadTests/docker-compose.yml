@@ -6,10 +6,6 @@ services:
     command:
       - --web.enable-remote-write-receiver
       - --enable-feature=native-histograms
-      - --config.file=/etc/prometheus/prometheus.yaml
-
-    volumes:
-      - ./config/prometheus.yam/etc/prometheus/prometheus.yaml
 
   grafana:
     image: grafana/grafana:latest

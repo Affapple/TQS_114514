@@ -1,7 +1,7 @@
 import { check } from "k6";
 import http from "k6/http";
 
-const BASE_URL = __ENV.BASE_URL || "http://localhost:3333";
+const BASE_URL = __ENV.BASE_URL || "http://localhost:8080";
 
 export const options = {
   stages: [
@@ -17,27 +17,63 @@ export const options = {
     http_req_duration: ["p(95)<1100"], // 95% of requests should be below 1100ms
     checks: ["rate>0.98"], // 98% dos checks têm de passar
   },
+  // Add prometheus configuration
+  ext: {
+    loadimpact: {
+      distribution: {
+        'prometheus': { percent: 100 }
+      }
+    }
+  }
 };
 
+// Test data
+const RESTAURANT_ID = __ENV.RESTAURANT_ID || "1";
+const RESERVATION_ID = __ENV.RESERVATION_ID || "ABC12345";
+
 export default function() {
-  let restrictions = {
-    maxCaloriesPerSlice: 500,
-    mustBeVegetarian: false,
-    excludedIngredients: ["pepperoni"],
-    excludedTools: ["knife"],
-    maxNumberOfToppings: 6,
-    minNumberOfToppings: 2,
-  };
-  let res = http.post(`${BASE_URL}/api/pizza`, JSON.stringify(restrictions), {
-    headers: {
-      "Content-Type": "application/json",
-      "X-User-ID": 23423,
-      Authorization: "token abcdef0123456789",
-    },
+  // Restaurant endpoints
+  const restaurantsRes = http.get(`${BASE_URL}/api/v1/restaurants`);
+  check(restaurantsRes, {
+    "restaurants status is 200": (r) => r.status === 200,
+    "restaurants response time < 500ms": (r) => r.timings.duration < 500,
   });
 
-  check(res, {
-    "is status 200": (r) => r.status === 200,
-    "body size is lower than 1k": (r) => r.body.length <= 1000,
+  const restaurantRes = http.get(`${BASE_URL}/api/v1/restaurants/${RESTAURANT_ID}`);
+  check(restaurantRes, {
+    "restaurant by id status is 200": (r) => r.status === 200,
+    "restaurant by id response time < 500ms": (r) => r.timings.duration < 500,
+  });
+
+  const menusRes = http.get(`${BASE_URL}/api/v1/restaurants/${RESTAURANT_ID}/menus`);
+  check(menusRes, {
+    "restaurant menus status is 200": (r) => r.status === 200,
+    "restaurant menus response time < 500ms": (r) => r.timings.duration < 500,
+  });
+
+  // Reservation endpoints
+  const reservationsRes = http.get(`${BASE_URL}/api/v1/reservations?restaurantId=${RESTAURANT_ID}`);
+  check(reservationsRes, {
+    "reservations status is 200": (r) => r.status === 200,
+    "reservations response time < 500ms": (r) => r.timings.duration < 500,
+  });
+
+  const reservationRes = http.get(`${BASE_URL}/api/v1/reservations/${RESERVATION_ID}`);
+  check(reservationRes, {
+    "reservation by id status is 200": (r) => r.status === 200,
+    "reservation by id response time < 500ms": (r) => r.timings.duration < 500,
+  });
+
+  // Weather endpoints
+  const weatherRes = http.get(`${BASE_URL}/api/v1/weather/forecast`);
+  check(weatherRes, {
+    "weather forecast status is 200": (r) => r.status === 200,
+    "weather forecast response time < 500ms": (r) => r.timings.duration < 500,
+  });
+
+  const cacheStatsRes = http.get(`${BASE_URL}/api/v1/weather/cache/stats`);
+  check(cacheStatsRes, {
+    "cache stats status is 200": (r) => r.status === 200,
+    "cache stats response time < 500ms": (r) => r.timings.duration < 500,
   });
 }
