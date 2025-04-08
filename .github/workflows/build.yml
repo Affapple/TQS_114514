@@ -39,5 +39,6 @@ jobs:
         run:
           mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
           -Dsonar.projectKey=Affapple_TQS_114514 \
-          -Dsonar.sources=src/main/*,src/test/* \
+          -Dsonar.sources=src/main/java \
+          -Dsonar.tests=src/test/java \
           -Pcoverage
