@@ -13,7 +13,7 @@
 	<artifactId>canteen</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>canteen</name>
-	<description>Canteen Facilities - TQS</description>
+	<description>Canteen Facilities - TQS Homework 1</description>
 
 	<properties>
     <java.version>21</java.version>
