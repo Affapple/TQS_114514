@@ -4,13 +4,12 @@ import { AppContext } from "@hooks/AppContext";
 import { Reservation } from "@Types/Reservation";
 import { Restaurant } from "@Types/Restaurant";
 import { useContext, useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import styles from "./styles.module.css";
 
 function ReservationDetails() {
   const { id: restaurantId } = useParams<{id: string}>();
   const { mode } = useContext(AppContext);
-  const navigate = useNavigate();
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

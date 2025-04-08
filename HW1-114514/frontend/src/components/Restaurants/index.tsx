@@ -5,6 +5,7 @@ import styles from "./styles.module.css";
 import { useNavigate } from "react-router";
 import UserReservation from "../UserReservation";
 import { getReservation } from "@api/Reservation";
+import { Reservation } from "@Types/Reservation";
 
 export default function Restaurants() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -95,7 +96,7 @@ export default function Restaurants() {
                   <h2>Procurar uma reserva</h2>
                   <div className={styles.modalInput}>
                     <input
-                      id="reservation-code"
+                      id="reservation-code-input"
                       type="text"
                       placeholder="Código da reserva"
                       value={reservationCode}

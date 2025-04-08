@@ -183,3 +183,13 @@ main {
 .reservationItem > div:last-child {
   margin-bottom: 0;
 }
+
+.reservationCode {
+  font-size: 14px;
+  color: #333;
+}
+
+.reservationStatus {
+  font-size: 14px;
+  color: #333;
+}

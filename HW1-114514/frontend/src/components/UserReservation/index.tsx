@@ -22,7 +22,7 @@ function UserReservation({ reservation, setReservation }: { reservation: Reserva
         <div className={styles.details}>
           <div className={styles.detailRow}>
             <span className={styles.label}>Code:</span>
-            <span className={styles.value}>{reservation.code}</span>
+            <span className={styles.value} id="reservation-code">{reservation.code}</span>
           </div>
           <div className={styles.detailRow}>
             <span className={styles.label}>Status:</span>

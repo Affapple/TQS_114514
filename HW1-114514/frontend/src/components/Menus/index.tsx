@@ -368,8 +368,8 @@ export default function Menus() {
             {menus.map((menu) => (
               <div key={menu.id} className={styles.menuCard}>
                 <div className={styles.menuHeader}>
-                  <div className={styles.menuDate} value={menu.date} time={menu.time}>{formatDate(menu.date)}</div>
-                  <div className={styles.menuTime}>
+                  <div className={styles.menuDate} value={menu.date}>{formatDate(menu.date)}</div>
+                  <div className={styles.menuTime} value={menu.time}>
                     {menu.time === MenuTime.LUNCH ? "Almoço" : "Jantar"}
                   </div>
                 </div>
@@ -430,18 +430,19 @@ export default function Menus() {
             <div className={styles.modalContent}>
               {reservationSuccess ? (
                 <>
-                  <h2>Reserva criada com sucesso</h2>
-                  <p>Codigo(s) de reserva: {reservationCode.join(", ")}</p>
+                  <h2 className={styles.successMessage}>Reserva criada com sucesso</h2>
+                  <p>Codigo(s) de reserva: <span className={styles.reservationCode}>{reservationCode.join(", ")}</span></p>
                 </>
               ) : (
                 <>
-                  <h2>Erro ao criar reserva</h2>
+                  <h2 className={styles.errorMessage}>Erro ao criar reserva</h2>
                   <p>{error}</p>
                 </>
               )}
               <button
                 onClick={closeModal}
                 className={styles.bigButton + " " + styles.cancelButton}
+                id="close-modal"
               >
                 Fechar
               </button>

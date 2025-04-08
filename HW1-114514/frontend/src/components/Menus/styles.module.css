@@ -396,3 +396,12 @@ button:hover {
   padding: 20px;
   border-radius: 8px;
 }
+
+
+.successMessage{
+  color: #4CAF50;
+}
+
+.reservationCode {
+  font-weight: 600;
+}

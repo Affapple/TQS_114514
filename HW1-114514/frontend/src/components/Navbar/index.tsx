@@ -15,7 +15,7 @@ function Navbar() {
         }}
       >Canteen</span>
       <div className={styles.modeSwitch}>
-        {mode}-View <a onClick={switchMode}>Switch</a>
+        {mode}-View <a onClick={switchMode} id="switch-mode">Switch</a>
       </div>
     </nav>
   );
