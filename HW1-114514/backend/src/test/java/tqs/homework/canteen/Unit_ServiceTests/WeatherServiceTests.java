@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -49,7 +50,7 @@ public class WeatherServiceTests {
     @BeforeEach
     public void setUp() {
         // Set the API key for testing
-        ReflectionTestUtils.setField(weatherService, "apiKey", "test-api-key");
+        ReflectionTestUtils.setField(weatherService, "apiKey", "8a37c711ea644cafb77191906250604");
         ReflectionTestUtils.setField(weatherService, "restTemplate", restTemplate);
     }
     

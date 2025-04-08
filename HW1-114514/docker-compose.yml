@@ -25,18 +25,18 @@ services:
     networks:
       - network 
 
-  # frontend:
-  #   depends_on:
-  #     - backend
-  #
-  #   build:
-  #     context: ./frontend
-  #
-  #   networks:
-  #     - network 
-  #
-  #   ports:
-  #     - "5173:5173"
+  frontend:
+    depends_on:
+      - backend
+
+    build:
+      context: ./frontend
+
+    networks:
+      - network 
+
+    ports:
+      - "5173:5173"
 
   backend:
     depends_on:
