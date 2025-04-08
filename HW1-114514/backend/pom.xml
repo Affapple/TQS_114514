@@ -17,6 +17,7 @@
 
 	<properties>
     <java.version>21</java.version>
+	<sonar.projectKey>Affapple_TQS_114514</sonar.projectKey>
     <sonar.organization>affapple</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
