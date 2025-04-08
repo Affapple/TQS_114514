@@ -24,3 +24,9 @@
         GET -> Get info of a reservation
         DELETE -> Cancel a reservation
         PUT -> Checkin reservation
+
+/weather
+    GET -> Get weather forecast for the following 7 days
+    /cache
+        /stats
+            GET -> Get cache statistics
