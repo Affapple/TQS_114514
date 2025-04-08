@@ -139,9 +139,6 @@ public class MenuService implements IMenuService {
     }
 
     public boolean hasMenusFrom(Long restaurantId, LocalDate date) {
-        if (date == null) {
-            return false;
-        }
         return menuRepository.existsByRestaurant_idAndDateFrom(restaurantId, date);
     }
 }

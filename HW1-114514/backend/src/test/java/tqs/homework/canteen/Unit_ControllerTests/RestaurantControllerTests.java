@@ -222,9 +222,11 @@ public class RestaurantControllerTests {
       */
     @Test
     public void whenGetMenusOfRestaurantBetweenDates3_thenListOfMenusIsReturned() throws Exception {
+        Menu lastMenu = new Menu();
+        lastMenu.setDate(LocalDate.of(2025, 4, 2));
         when(
             menuService.getMenusOfRestaurantBetweenDates(1L, null, null)
-        ).thenReturn(List.of(new Menu(), new Menu()));
+        ).thenReturn(List.of(new Menu(), lastMenu));
 
         mvc.perform(
             get("/api/v1/restaurants/1/menus")
