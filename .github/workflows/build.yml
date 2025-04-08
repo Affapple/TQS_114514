@@ -3,15 +3,14 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'HW1-114514/backend/**'
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
   build:
     name: Build and analyze
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: HW1-114514/backend
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,6 +26,7 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
+
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
@@ -34,6 +34,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Build and analyze
+        working-directory: HW1-114514/backend
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
