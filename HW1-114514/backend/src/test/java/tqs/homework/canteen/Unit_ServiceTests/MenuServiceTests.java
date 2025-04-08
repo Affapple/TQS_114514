@@ -691,4 +691,20 @@ class MenuServiceTests {
             "No error thrown when attempting to delete unexistent meal!"
         );
     }
+
+
+    /* METHOD: hasMenusFrom */
+    @Test
+    public void whenHasMenusFrom_thenReturnTrue() {
+        when(menuRepository.existsByRestaurant_idAndDateFrom(anyLong(), Mockito.any(LocalDate.class))).thenReturn(true);
+
+        assertTrue(menuService.hasMenusFrom(1L, LocalDate.now()));
+    }
+
+    @Test
+    public void whenHasMenusFrom_thenReturnFalse() {
+        when(menuRepository.existsByRestaurant_idAndDateFrom(anyLong(), Mockito.any(LocalDate.class))).thenReturn(false);
+
+        assertFalse(menuService.hasMenusFrom(1L, LocalDate.now()));
+    }
 }

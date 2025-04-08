@@ -3,6 +3,7 @@ package tqs.homework.canteen.Unit_RepositoryTests;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -52,7 +53,6 @@ class RepositoryTests {
         res.setName("Castro");
         restaurantRepository.save(res);
 
-        // Create a menu for today
         createNewMenu(res, LocalDate.now());
     }
 
@@ -127,6 +127,24 @@ class RepositoryTests {
                     LocalDate.now().plusDays(1)
                 ),
             is(false)
+        );
+    }
+
+    @Test
+    public void whenHasMenusAfterDate_thenReturnTrue() {
+        Restaurant res = restaurantRepository.findAll().getFirst();
+
+        assertTrue(
+            menuRepository.existsByRestaurant_idAndDateFrom(res.getId(), LocalDate.now())
+        );
+    }
+
+    @Test
+    public void whenDoesntHaveMenusAfterDate_thenReturnFalse() {
+        Restaurant res = restaurantRepository.findAll().getFirst();
+
+        assertFalse(
+            menuRepository.existsByRestaurant_idAndDateFrom(res.getId(), LocalDate.now().plusDays(1))
         );
     }
 

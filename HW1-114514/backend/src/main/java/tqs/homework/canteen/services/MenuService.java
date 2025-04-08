@@ -103,13 +103,12 @@ public class MenuService implements IMenuService {
         if (!restaurantRepository.existsById(restaurantId)) {
             throw new NoSuchElementException("Restaurant with id \"" + restaurantId + "\" not found!");
         }
+
         if (from == null) {
             from = LocalDate.now();
         }
-        if (from != null) {
+        if (to == null) {
             to = from.plusDays(6);
-        } else {
-            to = LocalDate.now().plusDays(6);
         }
 
         logger.info("Getting menus of restaurant {} from {} to {}", restaurantId, from, to);

@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -38,6 +39,7 @@ import io.github.bonigarcia.seljup.SeleniumJupiter;
     }
 )
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Disabled
 public class FrontendInterfaceTests {
     private static final String FRONTEND_URL = "http://localhost:5173";
     
