@@ -86,10 +86,9 @@ public class CacheTests {
      * then null is returned, and the cache miss counter is incremented
      */
     @Test
-    public void testGetExpiredKey() throws InterruptedException {
+    public void testGetExpiredKey() {
         cache.put("key", "value");
         cache.setTtl(0L);
-        Thread.sleep(1);
         assertThat(cache.get("key"), is(nullValue()));
         assertThat(cache.getCacheMisses(), is(1L));
     }

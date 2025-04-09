@@ -42,13 +42,8 @@ public class WeatherController {
         LocalDate to = LocalDate.now().plusDays(6);
         logger.info("Fetching weather forecast from {} to {}", from, to);
         
-        try {
-            List<Forecast> forecasts = weatherService.getWeather(from, to);
-            return ResponseEntity.ok(forecasts);
-        } catch (Exception e) {
-            logger.error("Error retrieving weather forecast: {}", e.getMessage(), e);
-            throw e;
-        }
+        List<Forecast> forecasts = weatherService.getWeather(from, to);
+        return ResponseEntity.ok(forecasts);
     }
 
     @Operation(summary = "Get cache statistics", description = "Retrieves statistics about the weather forecast cache")

@@ -37,7 +37,7 @@ public class Cache<T> {
             return null;
         }
         CacheEntry<T> entry = cache.get(key);
-        if (ttl < System.currentTimeMillis() - entry.getTimestamp()) {
+        if (ttl <= System.currentTimeMillis() - entry.getTimestamp()) {
             cacheMisses++;
             cache.remove(key);
             return null;
