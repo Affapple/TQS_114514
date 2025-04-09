@@ -1,10 +1,10 @@
 services:
-  sonarqube:
-    image: sonarqube:latest
-    environment:
-      SONAR_ES_BOOTSTRAP_CHECKS_DISABLED: true
-    ports:
-     - 9000:9000
+  # sonarqube:
+  #   image: sonarqube:latest
+  #   environment:
+  #     SONAR_ES_BOOTSTRAP_CHECKS_DISABLED: true
+  #   ports:
+  #    - 9000:9000
 
   postgres:
     image: postgres
@@ -14,8 +14,8 @@ services:
 
     environment:
       POSTGRES_USER: $DB_USERNAME
-      POSTGRES_PASSWORD: $DB_PASSWORD 
-      POSTGRES_DB: $DB_NAME 
+      POSTGRES_PASSWORD: $DB_PASSWORD
+      POSTGRES_DB: $DB_NAME
 
     ports:
       - 5432:5432
@@ -23,7 +23,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - network 
+      - network
 
   frontend:
     depends_on:
@@ -33,7 +33,7 @@ services:
       context: ./frontend
 
     networks:
-      - network 
+      - network
 
     ports:
       - "5173:5173"
@@ -46,7 +46,7 @@ services:
       context: ./backend
 
     networks:
-      - network 
+      - network
 
     ports:
       - "8080:8080"
@@ -60,7 +60,7 @@ services:
         "springdoc.api-docs.path": "/api/v1/docs",
         "weatherapi.key": "$WEATHERAPI_KEY",
         "cache.ttl": "$CACHE_TTL"
-      }'
+        }'
 
 volumes:
   postgres_data:
