@@ -9,13 +9,19 @@ function Navbar() {
 
   return (
     <nav className={styles.navbar}>
-      <span className={styles.appName} 
+      <span
+        className={styles.appName}
         onClick={() => {
           navigate("/");
         }}
-      >Canteen</span>
+      >
+        Universidade do Moliceiro
+      </span>
       <div className={styles.modeSwitch}>
-        {mode}-View <a onClick={switchMode} id="switch-mode">Switch</a>
+        {mode}-View{" "}
+        <a onClick={switchMode} id="switch-mode">
+          Switch
+        </a>
       </div>
     </nav>
   );

@@ -2,7 +2,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AppContext, Mode } from "@hooks/AppContext";
 import { useState } from "react";
 import Navbar from "@components/Navbar";
-import UserReservation from "@components/UserReservation";
 import Menus from "@components/Menus";
 import Restaurants from "@components/Restaurants";
 import styles from "./styles.module.css";

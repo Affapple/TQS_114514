@@ -7,23 +7,24 @@ interface ContentProps {
   clearSelection: () => void;
 }
 
-export default function Content({title, children, showingRestaurants, clearSelection}: ContentProps) {
+export default function Content({
+  title,
+  children,
+  showingRestaurants,
+  clearSelection,
+}: ContentProps) {
   return (
     <>
-    <div className={styles.title}>
-      <span>{title}</span>
-      {
-        !showingRestaurants && (
+      <div className={styles.title}>
+        <span>{title}</span>
+        {!showingRestaurants && (
           <button onClick={clearSelection}>
             <span>Clear</span>
           </button>
-        )
-      }
-    </div>
+        )}
+      </div>
 
-    <div className={styles.content}>
-      {children}
-    </div>
+      <div className={styles.content}>{children}</div>
     </>
-  )
+  );
 }

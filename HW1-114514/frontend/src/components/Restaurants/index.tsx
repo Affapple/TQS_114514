@@ -59,7 +59,9 @@ export default function Restaurants() {
   return (
     <div className={styles.container}>
       <h1>Restaurantes</h1>
-      <button onClick={() => openModal()} id="search-reservations">Procurar uma reserva</button>
+      <button onClick={() => openModal()} id="search-reservations">
+        Procurar uma reserva
+      </button>
       <div className={styles.restaurants}>
         {restaurants.length > 0 ? (
           restaurants.map((restaurant) => (
@@ -79,7 +81,7 @@ export default function Restaurants() {
           ))
         ) : (
           <div className={styles.noRestaurants}>
-            <span>No restaurants found</span>
+            <span>Nenhuma cantina encontrada</span>
           </div>
         )}
       </div>
@@ -89,7 +91,10 @@ export default function Restaurants() {
             <div className={styles.modalContent}>
               {reservation && !error ? (
                 <>
-                  <UserReservation reservation={reservation} setReservation={setReservation}/>
+                  <UserReservation
+                    reservation={reservation}
+                    setReservation={setReservation}
+                  />
                 </>
               ) : (
                 <>
