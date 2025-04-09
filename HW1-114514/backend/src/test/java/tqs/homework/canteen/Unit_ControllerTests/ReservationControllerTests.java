@@ -156,7 +156,7 @@ public class ReservationControllerTests {
     }
 
     /**
-     *  Given a valid mealId and free capacity,
+     * Given a valid mealId and free capacity,
      * when the meal is reserved
      * then a reservation is created and returned.
      */
