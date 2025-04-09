@@ -10,14 +10,11 @@ import tqs.homework.canteen.DTOs.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.isNotNull;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -39,7 +36,6 @@ import io.github.bonigarcia.seljup.SeleniumJupiter;
     }
 )
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Disabled
 public class FrontendInterfaceTests {
     private static final String FRONTEND_URL = "http://localhost:5173";
     
@@ -206,8 +202,10 @@ public class FrontendInterfaceTests {
         
         SearchReservationsPage searchReservationsPage = homePage.goToSearchReservation();
         ReservationDataPage reservationDataPage = searchReservationsPage.search(reservation.getCode());
+        reservationDataPage.cancelReservation();
+
         assertThat(reservationDataPage.getReservationCode(), is(reservation.getCode()));
-        assertThat(reservationDataPage.getReservationStatus(), is(ReservationStatus.ACTIVE.name()));
+        assertThat(reservationDataPage.getReservationStatus(), is(ReservationStatus.CANCELLED.name()));
     }
 
     /**
@@ -298,7 +296,7 @@ public class FrontendInterfaceTests {
      */
     @Test
     public void testWorkerCancelReservation() {
-        homePage.switchMode();
+        homePage.switchMode(); // Switch to worker mode
         createMeals(
             restaurantService.getAllRestaurants().get(0).getId(),
             LocalDate.now(),
@@ -306,7 +304,9 @@ public class FrontendInterfaceTests {
         );
 
         MenusPage menusPage = homePage.goToMenusOfRestaurant("Castro");
-        ReservationRequestPage reservationRequestPage = menusPage.reserveMeal(LocalDate.now().toString(), MenuTime.LUNCH);
+        ReservationRequestPage reservationRequestPage = menusPage.reserveMeal(
+            LocalDate.now().toString(), MenuTime.LUNCH
+        );
         String reservationCode = reservationRequestPage.getReservationCode();
         menusPage = reservationRequestPage.closeModal();
 
@@ -314,7 +314,6 @@ public class FrontendInterfaceTests {
         assertThat(allReservationsPage.getNumberOfReservations(), is(1));
 
         allReservationsPage.cancelReservation(reservationCode);
-
         allReservationsPage.refreshPage();
 
         assertThat(
