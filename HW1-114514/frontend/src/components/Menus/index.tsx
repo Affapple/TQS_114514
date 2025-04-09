@@ -1,6 +1,6 @@
 import { getRestaurantById, getRestaurantMenus } from "@api/Restaurant";
 import { createMenu } from "@api/Menu";
-import { AppContext, Mode } from "@hooks/AppContext";
+import { AppContext } from "@hooks/AppContext";
 import { Menu } from "@Types/Menu";
 import { Restaurant } from "@Types/Restaurant";
 import { MenuRequestDTO } from "@Types/MenuRequestDTO";
@@ -88,7 +88,7 @@ export default function Menus() {
               return a.time === MenuTime.LUNCH ? -1 : 1;
             }
             return a.date < b.date ? -1 : 1;
-          })
+          }),
         );
         setHasMore(response.data.hasMore);
       } else {
@@ -142,7 +142,14 @@ export default function Menus() {
         // Refresh menus after adding
         const updatedMenus = await getRestaurantMenus(restaurant.id);
         if (updatedMenus.status === 200) {
-          setMenus(updatedMenus.data);
+          setMenus(
+            updatedMenus.data.menus.sort((a, b) => {
+              if (a.date === b.date) {
+                return a.time === MenuTime.LUNCH ? -1 : 1;
+              }
+              return a.date < b.date ? -1 : 1;
+            }),
+          );
         }
         setShowAddMenu(false);
         setMealOptions([]);
@@ -158,7 +165,7 @@ export default function Menus() {
   const handleMealChange = (
     index: number,
     field: "description" | "type",
-    value: string
+    value: string,
   ) => {
     const updatedMeals = [...mealOptions];
     if (field === "type") {
@@ -368,7 +375,11 @@ export default function Menus() {
             {menus.map((menu) => (
               <div key={menu.id} className={styles.menuCard}>
                 <div className={styles.menuHeader}>
-                  <div className={styles.menuDate} value={menu.date}>{formatDate(menu.date)}</div>
+                  {/*@ts-expect-error: TS2322 */}
+                  <div className={styles.menuDate} value={menu.date}>
+                    {formatDate(menu.date)}
+                  </div>
+                  {/*@ts-expect-error: TS2322 */}
                   <div className={styles.menuTime} value={menu.time}>
                     {menu.time === MenuTime.LUNCH ? "Almoço" : "Jantar"}
                   </div>
@@ -383,14 +394,14 @@ export default function Menus() {
                       <div key={meal.id} className={styles.mealItem}>
                         <div
                           className={`${styles.mealType} ${getMealTypeClass(
-                            meal.type
+                            meal.type,
                           )}`}
                         >
                           {meal.type === "SOUP"
                             ? "Sopa"
                             : meal.type === "MEAT"
-                            ? "Carne"
-                            : "Peixe"}
+                              ? "Carne"
+                              : "Peixe"}
                         </div>
                         <div className={styles.mealDescription}>
                           {meal.description}
@@ -430,8 +441,15 @@ export default function Menus() {
             <div className={styles.modalContent}>
               {reservationSuccess ? (
                 <>
-                  <h2 className={styles.successMessage}>Reserva criada com sucesso</h2>
-                  <p>Codigo(s) de reserva: <span className={styles.reservationCode}>{reservationCode.join(", ")}</span></p>
+                  <h2 className={styles.successMessage}>
+                    Reserva criada com sucesso
+                  </h2>
+                  <p>
+                    Codigo(s) de reserva:{" "}
+                    <span className={styles.reservationCode}>
+                      {reservationCode.join(", ")}
+                    </span>
+                  </p>
                 </>
               ) : (
                 <>
