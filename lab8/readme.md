@@ -75,6 +75,8 @@ We used deprecated methods, that decision was consciously made at the time as th
 We also left out some comented code, and didnt use loggers, only prints to stdout
 Finally an high severity was that we didnt follow convention
 
+# 8.4
+
 ## c, d
 
 Asked about TripInfoService class, if the code was maintainable, clean,easy to understand and open to future changes, and it suggested
