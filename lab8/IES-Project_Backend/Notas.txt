@@ -1,0 +1,27 @@
+Car_Satus pode definir o intervalo entre gets do live info
+Caso o car status seja off
+    intervalo = 30 segundos
+Senao
+    intervalo = 5 segundos
+TimeStamp: Date time ou long? (Timestamp normalmente é Long)
+TripID: Nao será melhor ser Long tmb?
+
+
+[TODO]
+    * Adicionar Auth tokens (jwt)
+    * Refactor ao código para buscar o user pelo auth token
+    * Decidir comportamento padrao dos servicos (Se dão throw para o Controller)
+
+
+
+#############################################################################
+javadoc -d docs -sourcepath src/main/java -subpackages ies.carbox.api.RestAPI
+To run javadocs: mvn javadoc:javadoc
+
+To run RestAPI:
+mvn clean package -DskipTests
+ Because we don't have the db yet
+
+
+ Agora para ver a documentação: folder ./target/site -> arrastar index.html to url browser
+ TODO: Take care of warnings, make javadocs prettier
